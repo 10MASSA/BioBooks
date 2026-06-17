@@ -1,0 +1,19 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 400 500">
+  <defs>
+    <linearGradient id="cover" x1="0%" y1="0%" x2="0%" y2="100%">
+      <stop offset="0%" style="stop-color:#059669"/>
+      <stop offset="100%" style="stop-color:#064e3b"/>
+    </linearGradient>
+  </defs>
+  <rect width="400" height="500" fill="#f3f4f6" rx="12"/>
+  <rect x="60" y="40" width="280" height="400" rx="10" fill="url(#cover)"/>
+  <rect x="70" y="50" width="260" height="380" rx="6" fill="#10b981"/>
+  <text x="200" y="140" text-anchor="middle" font-family="Arial,sans-serif" font-size="20" font-weight="bold" fill="white">ANALYSES</text>
+  <text x="200" y="170" text-anchor="middle" font-family="Arial,sans-serif" font-size="20" font-weight="bold" fill="white">MÉDICALES</text>
+  <line x1="100" y1="200" x2="300" y2="200" stroke="white" stroke-width="2" opacity="0.5"/>
+  <text x="200" y="240" text-anchor="middle" font-family="Arial,sans-serif" font-size="12" fill="white" opacity="0.9">Prélèvements sanguins</text>
+  <text x="200" y="265" text-anchor="middle" font-family="Arial,sans-serif" font-size="12" fill="white" opacity="0.9">Biochimie • Hématologie</text>
+  <text x="200" y="290" text-anchor="middle" font-family="Arial,sans-serif" font-size="12" fill="white" opacity="0.9">Sérologie • Bilans</text>
+  <circle cx="200" cy="360" r="40" fill="white" opacity="0.2"/>
+  <path d="M185 360 L200 340 L215 360 L200 380 Z" fill="white" opacity="0.6"/>
+</svg>

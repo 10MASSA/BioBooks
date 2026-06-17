@@ -1,0 +1,216 @@
+{
+  "lang": {
+    "ar": "العربية",
+    "fr": "Français",
+    "en": "English"
+  },
+  "nav": {
+    "gallery": "Gallery",
+    "description": "Description",
+    "order": "Order",
+    "faq": "FAQ",
+    "contact": "Contact"
+  },
+  "hero": {
+    "title": "Two books for the price of one",
+    "price": "2000 DA for the pack",
+    "badge": "Promo pack: both books together with savings",
+    "cta": "Order now",
+    "stock": "Limited offer — Only {{count}} copies left!",
+    "perPack": "per pack",
+    "orIndividual": "Or order each book separately:"
+  },
+  "products": {
+    "title": "Choose your book",
+    "subtitle": "Order one book or the pack of both",
+    "bestOffer": "Best offer",
+    "unit": "copy",
+    "units": "copies",
+    "subtotal": "Subtotal",
+    "book1": {
+      "name": "Laboratory equipment",
+      "short": "Laboratory materials and tools for medical analysis"
+    },
+    "book2": {
+      "name": "Dosage techniques",
+      "short": "Practical guide to medical biology analyses"
+    },
+    "pack": {
+      "name": "Both together",
+      "short": "Both books — gift offer"
+    }
+  },
+  "gallery": {
+    "title": "Discover the content",
+    "subtitle": "Explore the pages and illustrations of our books",
+    "zoom": "Click to zoom"
+  },
+  "description": {
+    "title": "Book contents",
+    "subtitle": "Two comprehensive books to master biology and medical analysis",
+    "orderBook": "Order — {{price}} DA",
+    "book1": {
+      "title": "Book 1 — Laboratory Equipment",
+      "items": [
+        "Complete guide to laboratory equipment and tools",
+        "Overview of automated systems (FNS, Ionogram, Biochemistry, etc.)",
+        "How to use equipment (spectrophotometer, centrifuge, water bath, etc.)",
+        "Mastering pipettes, counting cells (Malassez, Nageotte), and tubes",
+        "Real illustrations and high-quality color photos",
+        "100% practical for laboratory work — 2nd Edition"
+      ]
+    },
+    "book2": {
+      "title": "Book 2 — Dosage Techniques",
+      "items": [
+        "Over 110 detailed dosage techniques and analyses",
+        "Blood collection techniques and selection of anticoagulants",
+        "Complete Blood Count (FNS Hémogramme) and blood smears",
+        "Comprehensive biochemistry assays (Glucose, HGPO, Urea, Creatinine, Cholesterol, etc.)",
+        "Immunological analyses, rapid strip tests, and ELISA methods",
+        "Serological exams (Toxoplasmosis, Rubella, Hepatitis, HIV, Syphilis, etc.)"
+      ]
+    },
+    "promo": "Don't just stick to theory, put it into practice! The Akou Series is your reference to master medical analyses, blood sampling, and laboratory equipment. Boost your skills and gain experience now!"
+  },
+  "showcase": {
+    "title": "Books Preview",
+    "subtitle": "Real photos and detailed illustrations of our biology books"
+  },
+  "feedback": {
+    "title": "Customer Feedback",
+    "subtitle": "What our buyers say about their experience with our books"
+  },
+  "audience": {
+    "title": "Target audience",
+    "subtitle": "Ideal for students in",
+    "fields": [
+      "Biology",
+      "Biochemistry",
+      "Pharmacy",
+      "Medicine",
+      "Paramedical",
+      "Chemistry",
+      "Immunology",
+      "Virology",
+      "Genetics",
+      "SNV"
+    ]
+  },
+  "advantages": {
+    "title": "Why choose our books?",
+    "items": [
+      "Practical training",
+      "Simple explanations",
+      "Color illustrations",
+      "Sampling methods",
+      "Dosage techniques",
+      "Complete educational support",
+      "Beginner to advanced level"
+    ]
+  },
+  "quantity": {
+    "title": "Choose your quantity",
+    "pack": "pack",
+    "packs": "packs",
+    "total": "Total",
+    "perPack": "{{price}} DA / pack"
+  },
+  "order": {
+    "title": "Place your order",
+    "subtitle": "Fill out the form and receive your books at home",
+    "firstName": "First name",
+    "lastName": "Last name",
+    "phone": "Phone",
+    "wilaya": "Wilaya",
+    "commune": "Commune",
+    "address": "Full address",
+    "quantity": "Quantity",
+    "product": "Product",
+    "selectWilaya": "Select a wilaya",
+    "selectCommune": "Select a commune",
+    "selectWilayaFirst": "Select a wilaya first",
+    "subtotal": "Subtotal",
+    "delivery": "Delivery fee",
+    "total": "Total amount",
+    "payment": "Cash on delivery",
+    "submit": "Confirm order",
+    "submitting": "Sending...",
+    "required": "This field is required",
+    "invalidPhone": "Invalid phone number (10 digits)",
+    "success": {
+      "title": "Order confirmed!",
+      "message": "Thank you {{name}}! Your order ({{product}} × {{qty}}) has been registered. We will contact you soon at {{phone}}.",
+      "newOrder": "New order"
+    }
+  },
+  "contact": {
+    "title": "Contact us",
+    "subtitle": "Have a question? Contact us directly",
+    "whatsapp": "WhatsApp",
+    "messenger": "Messenger",
+    "chatNow": "Chat now"
+  },
+  "faq": {
+    "title": "Frequently asked questions",
+    "items": [
+      {
+        "q": "How to pay?",
+        "a": "Payment is made on delivery in cash. You only pay when you receive your books."
+      },
+      {
+        "q": "What is the delivery time?",
+        "a": "Delivery usually takes between 2 and 5 business days depending on your wilaya."
+      },
+      {
+        "q": "Is the book in color?",
+        "a": "Yes! Both books contain high-quality color illustrations and photos."
+      },
+      {
+        "q": "Which students is it for?",
+        "a": "These books are designed for students in biology, biochemistry, pharmacy, medicine, paramedical, chemistry, immunology, virology, genetics and SNV."
+      }
+    ]
+  },
+  "footer": {
+    "copyright": "© {{year}} BioBooks. All rights reserved.",
+    "followUs": "Follow us"
+  },
+  "whatsapp": {
+    "tooltip": "Contact us on WhatsApp"
+  },
+  "admin": {
+    "title": "Admin panel",
+    "login": "Login",
+    "password": "Password",
+    "loginBtn": "Sign in",
+    "logout": "Logout",
+    "orders": "Orders",
+    "noOrders": "No orders yet",
+    "export": "Export Excel",
+    "delete": "Delete",
+    "confirmDelete": "Delete this order?",
+    "status": {
+      "pending": "Pending",
+      "confirmed": "Confirmed",
+      "shipped": "Shipped",
+      "delivered": "Delivered",
+      "cancelled": "Cancelled"
+    },
+    "columns": {
+      "id": "ID",
+      "name": "Name",
+      "phone": "Phone",
+      "wilaya": "Wilaya",
+      "commune": "Commune",
+      "address": "Address",
+      "product": "Product",
+      "quantity": "Qty",
+      "total": "Total",
+      "status": "Status",
+      "date": "Date",
+      "actions": "Actions"
+    },
+    "invalidPassword": "Incorrect password"
+  }
+}

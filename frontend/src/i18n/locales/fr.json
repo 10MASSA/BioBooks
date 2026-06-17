@@ -1,0 +1,216 @@
+{
+  "lang": {
+    "ar": "العربية",
+    "fr": "Français",
+    "en": "English"
+  },
+  "nav": {
+    "gallery": "Galerie",
+    "description": "Description",
+    "order": "Commander",
+    "faq": "FAQ",
+    "contact": "Contact"
+  },
+  "hero": {
+    "title": "Deux livres pour le prix d'un seul",
+    "price": "2000 DA le pack",
+    "badge": "Pack promo : les deux livres ensemble avec économie",
+    "cta": "Commander maintenant",
+    "stock": "Offre limitée — Plus que {{count}} exemplaires disponibles !",
+    "perPack": "par pack",
+    "orIndividual": "Ou commandez chaque livre séparément :"
+  },
+  "products": {
+    "title": "Choisissez votre livre",
+    "subtitle": "Commandez un livre seul ou le pack des deux",
+    "bestOffer": "Meilleure offre",
+    "unit": "exemplaire",
+    "units": "exemplaires",
+    "subtotal": "Sous-total",
+    "book1": {
+      "name": "Matériels de laboratoire",
+      "short": "Matériels et outils de laboratoire d'analyse médicale"
+    },
+    "book2": {
+      "name": "Techniques de dosages",
+      "short": "Guide pratique des analyses de biologie médicale"
+    },
+    "pack": {
+      "name": "Les deux ensemble",
+      "short": "Les 2 livres — offre cadeau"
+    }
+  },
+  "gallery": {
+    "title": "Découvrez le contenu",
+    "subtitle": "Explorez les pages et illustrations de nos livres",
+    "zoom": "Cliquez pour agrandir"
+  },
+  "description": {
+    "title": "Contenu des livres",
+    "subtitle": "Deux ouvrages complets pour maîtriser la biologie et les analyses médicales",
+    "orderBook": "Commander — {{price}} DA",
+    "book1": {
+      "title": "Livre 1 — Matériels de laboratoire",
+      "items": [
+        "Guide complet du matériel et des outils de laboratoire",
+        "Présentation des automates (FNS, Ionogramme, Biochimie, etc.)",
+        "Utilisation des appareils (spectrophotomètre, centrifugeuse, bain-marie, etc.)",
+        "Maîtrise des pipettes, cellules de numération (Malassez, Nageotte) et tubes",
+        "Illustrations réelles et photos en couleur de haute qualité",
+        "100% pratique pour les laboratoires — 2ème Édition"
+      ]
+    },
+    "book2": {
+      "title": "Livre 2 — Techniques de dosages",
+      "items": [
+        "Plus de 110 techniques de dosage et analyses détaillées",
+        "Techniques de prélèvement sanguin et choix des anticoagulants",
+        "Numération et Formule Sanguine (Hémogramme FNS) et frottis sanguins",
+        "Dosages biochimiques complets (Glycémie, HGPO, Urée, Créatinine, Cholestérol, etc.)",
+        "Analyses immunologiques, tests rapides par bandelettes et techniques ELISA",
+        "Examens sérologiques (Toxoplasmose, Rubéole, Hépatites, HIV, Syphilis, etc.)"
+      ]
+    },
+    "promo": "Ne vous contentez pas de la théorie, passez à la pratique ! Les Séries Akou sont votre référence pour maîtriser les analyses médicales, le prélèvement sanguin et le matériel de labo. Boostez vos compétences et gagnez en expérience !"
+  },
+  "showcase": {
+    "title": "Aperçu des Livres",
+    "subtitle": "Photos réelles et illustrations détaillées de nos ouvrages de biologie"
+  },
+  "feedback": {
+    "title": "Avis de nos Acheteurs",
+    "subtitle": "Ce que pensent nos clients de leur expérience avec nos livres"
+  },
+  "audience": {
+    "title": "Public cible",
+    "subtitle": "Idéal pour les étudiants en",
+    "fields": [
+      "Biologie",
+      "Biochimie",
+      "Pharmacie",
+      "Médecine",
+      "Paramédical",
+      "Chimie",
+      "Immunologie",
+      "Virologie",
+      "Génétique",
+      "SNV"
+    ]
+  },
+  "advantages": {
+    "title": "Pourquoi choisir nos livres ?",
+    "items": [
+      "Formation pratique",
+      "Explications simples",
+      "Illustrations en couleur",
+      "Méthodes de prélèvement",
+      "Techniques de dosage",
+      "Support pédagogique complet",
+      "Niveau débutant à avancé"
+    ]
+  },
+  "quantity": {
+    "title": "Choisissez votre quantité",
+    "pack": "pack",
+    "packs": "packs",
+    "total": "Total",
+    "perPack": "{{price}} DA / pack"
+  },
+  "order": {
+    "title": "Passer votre commande",
+    "subtitle": "Remplissez le formulaire et recevez vos livres à domicile",
+    "firstName": "Prénom",
+    "lastName": "Nom",
+    "phone": "Téléphone",
+    "wilaya": "Wilaya",
+    "commune": "Commune",
+    "address": "Adresse complète",
+    "quantity": "Quantité",
+    "product": "Produit",
+    "selectWilaya": "Sélectionnez une wilaya",
+    "selectCommune": "Sélectionnez une commune",
+    "selectWilayaFirst": "Sélectionnez d'abord une wilaya",
+    "subtotal": "Sous-total",
+    "delivery": "Frais de livraison",
+    "total": "Montant total",
+    "payment": "Paiement à la livraison",
+    "submit": "Confirmer la commande",
+    "submitting": "Envoi en cours...",
+    "required": "Ce champ est obligatoire",
+    "invalidPhone": "Numéro de téléphone invalide (10 chiffres)",
+    "success": {
+      "title": "Commande confirmée !",
+      "message": "Merci {{name}} ! Votre commande ({{product}} × {{qty}}) a été enregistrée. Nous vous contacterons bientôt au {{phone}}.",
+      "newOrder": "Nouvelle commande"
+    }
+  },
+  "contact": {
+    "title": "Contactez-nous",
+    "subtitle": "Une question ? Contactez-nous directement",
+    "whatsapp": "WhatsApp",
+    "messenger": "Messenger",
+    "chatNow": "Discuter maintenant"
+  },
+  "faq": {
+    "title": "Questions fréquentes",
+    "items": [
+      {
+        "q": "Comment payer ?",
+        "a": "Le paiement se fait à la livraison en espèces. Vous payez uniquement lorsque vous recevez vos livres."
+      },
+      {
+        "q": "Quel est le délai de livraison ?",
+        "a": "La livraison prend généralement entre 2 et 5 jours ouvrables selon votre wilaya."
+      },
+      {
+        "q": "Le livre est-il en couleur ?",
+        "a": "Oui ! Les deux livres contiennent des illustrations et photos en couleur de haute qualité."
+      },
+      {
+        "q": "Pour quels étudiants est-ce adapté ?",
+        "a": "Ces livres sont conçus pour les étudiants en biologie, biochimie, pharmacie, médecine, paramédical, chimie, immunologie, virologie, génétique et SNV."
+      }
+    ]
+  },
+  "footer": {
+    "copyright": "© {{year}} BioBooks. Tous droits réservés.",
+    "followUs": "Suivez-nous"
+  },
+  "whatsapp": {
+    "tooltip": "Contactez-nous sur WhatsApp"
+  },
+  "admin": {
+    "title": "Panneau d'administration",
+    "login": "Connexion",
+    "password": "Mot de passe",
+    "loginBtn": "Se connecter",
+    "logout": "Déconnexion",
+    "orders": "Commandes",
+    "noOrders": "Aucune commande pour le moment",
+    "export": "Exporter Excel",
+    "delete": "Supprimer",
+    "confirmDelete": "Supprimer cette commande ?",
+    "status": {
+      "pending": "En attente",
+      "confirmed": "Confirmée",
+      "shipped": "Expédiée",
+      "delivered": "Livrée",
+      "cancelled": "Annulée"
+    },
+    "columns": {
+      "id": "N°",
+      "name": "Nom",
+      "phone": "Téléphone",
+      "wilaya": "Wilaya",
+      "commune": "Commune",
+      "address": "Adresse",
+      "product": "Produit",
+      "quantity": "Qté",
+      "total": "Total",
+      "status": "Statut",
+      "date": "Date",
+      "actions": "Actions"
+    },
+    "invalidPassword": "Mot de passe incorrect"
+  }
+}
