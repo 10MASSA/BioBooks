@@ -48,12 +48,12 @@ export default function TargetAudience() {
             return (
               <motion.div
                 key={field}
-                initial={{ opacity: 0, scale: 0.9 }}
-                whileInView={{ opacity: 1, scale: 1 }}
-                viewport={{ once: true }}
-                transition={{ delay: i * 0.05 }}
-                whileHover={{ scale: 1.05 }}
-                className="flex flex-col items-center gap-3 p-5 bg-white rounded-2xl shadow-md border border-gray-100 hover:shadow-lg transition-shadow"
+                initial={{ opacity: 0, y: 25, scale: 0.95 }}
+                whileInView={{ opacity: 1, y: 0, scale: 1 }}
+                viewport={{ once: true, margin: "-50px" }}
+                transition={{ type: "spring", stiffness: 200, damping: 20, delay: i * 0.05 }}
+                whileHover={{ y: -6, scale: 1.03 }}
+                className="flex flex-col items-center gap-3 p-5 bg-white rounded-2xl shadow-md border border-gray-100 cursor-pointer select-none transition-all duration-300 hover:shadow-xl hover:border-primary-100"
               >
                 <div className={`w-12 h-12 rounded-xl flex items-center justify-center ${COLORS[i]}`}>
                   <Icon className="w-6 h-6" />

@@ -1,8 +1,9 @@
 import { useState, useEffect, useCallback } from 'react'
 import { useTranslation } from 'react-i18next'
 import {
-  LogOut, Download, Trash2, RefreshCw, Lock, Package,
+  LogOut, Download, Trash2, RefreshCw, Lock, Package, Bell, X,
 } from 'lucide-react'
+import { motion, AnimatePresence } from 'framer-motion'
 
 const STATUSES = ['pending', 'confirmed', 'shipped', 'delivered', 'cancelled']
 
@@ -14,6 +15,29 @@ const STATUS_COLORS = {
   cancelled: 'bg-red-100 text-red-800',
 }
 
+const playNotificationSound = () => {
+  try {
+    const audioCtx = new (window.AudioContext || window.webkitAudioContext)()
+    const playTone = (freq, startTime, duration) => {
+      const osc = audioCtx.createOscillator()
+      const gain = audioCtx.createGain()
+      osc.type = 'sine'
+      osc.frequency.setValueAtTime(freq, startTime)
+      gain.gain.setValueAtTime(0.15, startTime)
+      gain.gain.exponentialRampToValueAtTime(0.001, startTime + duration)
+      osc.connect(gain)
+      gain.connect(audioCtx.destination)
+      osc.start(startTime)
+      osc.stop(startTime + duration)
+    }
+    const now = audioCtx.currentTime
+    playTone(523.25, now, 0.15) // C5
+    playTone(659.25, now + 0.12, 0.3) // E5
+  } catch (error) {
+    console.error('Failed to play sound:', error)
+  }
+}
+
 export default function Admin() {
   const { t } = useTranslation()
   const [token, setToken] = useState(localStorage.getItem('admin_token') || '')
@@ -21,6 +45,7 @@ export default function Admin() {
   const [loginError, setLoginError] = useState('')
   const [orders, setOrders] = useState([])
   const [loading, setLoading] = useState(false)
+  const [newOrderToast, setNewOrderToast] = useState('')
 
   const fetchOrders = useCallback(async () => {
     if (!token) return
@@ -35,7 +60,15 @@ export default function Admin() {
         return
       }
       const data = await res.json()
-      setOrders(data)
+      
+      setOrders((prevOrders) => {
+        if (prevOrders.length > 0 && data.length > prevOrders.length) {
+          const diff = data.length - prevOrders.length
+          playNotificationSound()
+          setNewOrderToast(`${diff} nouvelle(s) commande(s) reçue(s) !`)
+        }
+        return data
+      })
     } catch {
       setOrders([])
     } finally {
@@ -46,6 +79,25 @@ export default function Admin() {
   useEffect(() => {
     if (token) fetchOrders()
   }, [token, fetchOrders])
+
+  // Polling for new orders every 15 seconds
+  useEffect(() => {
+    if (!token) return
+    const interval = setInterval(() => {
+      fetchOrders()
+    }, 15000)
+    return () => clearInterval(interval)
+  }, [token, fetchOrders])
+
+  // Clear toast after 5 seconds
+  useEffect(() => {
+    if (newOrderToast) {
+      const timer = setTimeout(() => {
+        setNewOrderToast('')
+      }, 5000)
+      return () => clearTimeout(timer)
+    }
+  }, [newOrderToast])
 
   const handleLogin = async (e) => {
     e.preventDefault()
@@ -139,7 +191,27 @@ export default function Admin() {
   }
 
   return (
-    <div className="min-h-screen bg-gray-100">
+    <div className="min-h-screen bg-gray-100 relative">
+      <AnimatePresence>
+        {newOrderToast && (
+          <motion.div
+            initial={{ opacity: 0, y: -50, scale: 0.9 }}
+            animate={{ opacity: 1, y: 0, scale: 1 }}
+            exit={{ opacity: 0, y: -20, scale: 0.9 }}
+            className="fixed top-20 left-1/2 -translate-x-1/2 z-50 bg-green-600 text-white px-6 py-4 rounded-2xl shadow-2xl flex items-center gap-3 font-bold border border-green-500"
+          >
+            <Bell className="w-6 h-6 animate-bounce shrink-0" />
+            <span>{newOrderToast}</span>
+            <button 
+              onClick={() => setNewOrderToast('')} 
+              className="hover:bg-white/10 p-1 rounded-lg transition-colors ml-2"
+            >
+              <X className="w-4 h-4" />
+            </button>
+          </motion.div>
+        )}
+      </AnimatePresence>
+
       <header className="bg-white shadow-sm border-b">
         <div className="max-w-7xl mx-auto px-4 py-4 flex items-center justify-between">
           <div className="flex items-center gap-3">

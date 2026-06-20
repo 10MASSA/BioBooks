@@ -12,10 +12,12 @@
     "contact": "Contact"
   },
   "hero": {
-    "title": "Two books for the price of one",
+    "title": "Two books for the price of 2000 DA",
     "price": "2000 DA for the pack",
     "badge": "Promo pack: both books together with savings",
     "cta": "Order now",
+    "bonus": "Bonus pack: both books + practical support + fast delivery",
+    "bonusDescription": "Enjoy a complete guide, an attractive discount, and easy ordering with home delivery.",
     "stock": "Limited offer — Only {{count}} copies left!",
     "perPack": "per pack",
     "orIndividual": "Or order each book separately:"
@@ -28,12 +30,12 @@
     "units": "copies",
     "subtotal": "Subtotal",
     "book1": {
-      "name": "Laboratory equipment",
-      "short": "Laboratory materials and tools for medical analysis"
+      "name": "Laboratory materials and tools",
+      "short": "Laboratory materials and tools"
     },
     "book2": {
-      "name": "Dosage techniques",
-      "short": "Practical guide to medical biology analyses"
+      "name": "Practical guide to medical biology analysis techniques",
+      "short": "Practical guide to medical biology analysis techniques"
     },
     "pack": {
       "name": "Both together",
@@ -47,10 +49,10 @@
   },
   "description": {
     "title": "Book contents",
-    "subtitle": "Two comprehensive books to master biology and medical analysis",
+    "subtitle": "Two comprehensive books to master and know everything about blood sampling, biochemical, haematological and serological analysis techniques — 100% practical — and materials and tools used in medical analysis laboratories",
     "orderBook": "Order — {{price}} DA",
     "book1": {
-      "title": "Book 1 — Laboratory Equipment",
+      "title": "Book 1 — Laboratory materials and tools",
       "items": [
         "Complete guide to laboratory equipment and tools",
         "Overview of automated systems (FNS, Ionogram, Biochemistry, etc.)",
@@ -61,7 +63,7 @@
       ]
     },
     "book2": {
-      "title": "Book 2 — Dosage Techniques",
+      "title": "Book 2 — Practical guide to medical biology analysis techniques",
       "items": [
         "Over 110 detailed dosage techniques and analyses",
         "Blood collection techniques and selection of anticoagulants",
@@ -75,7 +77,7 @@
   },
   "showcase": {
     "title": "Books Preview",
-    "subtitle": "Real photos and detailed illustrations of our biology books"
+    "subtitle": "Real photos and detailed illustrations of our medical biology books"
   },
   "feedback": {
     "title": "Customer Feedback",
@@ -125,6 +127,10 @@
     "wilaya": "Wilaya",
     "commune": "Commune",
     "address": "Full address",
+    "addressOptional": "Full address (Optional)",
+    "deliveryHome": "Home delivery",
+    "deliveryOffice": "Office delivery",
+    "deliveryMethod": "Delivery method",
     "quantity": "Quantity",
     "product": "Product",
     "selectWilaya": "Select a wilaya",
@@ -160,7 +166,7 @@
       },
       {
         "q": "What is the delivery time?",
-        "a": "Delivery usually takes between 2 and 5 business days depending on your wilaya."
+        "a": "Delivery takes a maximum of 48 hours depending on your wilaya."
       },
       {
         "q": "Is the book in color?",
@@ -173,7 +179,7 @@
     ]
   },
   "footer": {
-    "copyright": "© {{year}} BioBooks. All rights reserved.",
+    "copyright": "© {{year}} BiologyBooks. All rights reserved.",
     "followUs": "Follow us"
   },
   "whatsapp": {

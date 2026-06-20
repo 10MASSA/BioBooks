@@ -5,18 +5,18 @@ export const PRODUCTS = {
   book1: {
     id: 'book1',
     price: 700,
-    image: '/images/books-cover.png',
+    image: '/images/book1-cover.svg',
   },
   book2: {
     id: 'book2',
-    price: 1400,
-    image: '/images/books-cover.png',
+    price: 1600,
+    image: '/images/book2-cover.svg',
   },
   pack: {
     id: 'pack',
     price: 2000,
-    image: '/images/pricing-banner.png',
-    originalPrice: 2100,
+    image: '/images/pack-main.svg',
+    originalPrice: 2300,
   },
 }
 
@@ -31,7 +31,7 @@ export const MESSENGER_LINK = 'https://m.me/yourpage'
 export const FACEBOOK_LINK = 'https://facebook.com/yourpage'
 
 export const GALLERY_IMAGES = [
-  { src: '/images/books-cover.png', alt: 'books' },
+  { src: '/images/books-cover-real.jpg', alt: 'books' },
   { src: '/images/pricing-banner.png', alt: 'pricing' },
   { src: '/images/book1-cover.svg', alt: 'book1' },
   { src: '/images/book2-cover.svg', alt: 'book2' },

@@ -15,7 +15,7 @@ export default function Footer() {
               <div className="w-10 h-10 bg-primary-600 rounded-xl flex items-center justify-center">
                 <BookOpen className="w-5 h-5 text-white" />
               </div>
-              <span className="font-bold text-xl">BioBooks</span>
+              <span className="font-bold text-xl">BiologyBooks</span>
             </div>
             <p className="text-gray-400 text-sm">
               {t('hero.title')}

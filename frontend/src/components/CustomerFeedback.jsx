@@ -1,7 +1,7 @@
-import { useState } from 'react'
+import { useState, useEffect } from 'react'
 import { useTranslation } from 'react-i18next'
 import { motion, AnimatePresence } from 'framer-motion'
-import { MessageSquare, ZoomIn, X } from 'lucide-react'
+import { MessageSquare, ZoomIn, X, ChevronLeft, ChevronRight } from 'lucide-react'
 
 const FEEDBACKS = [
   {
@@ -20,16 +20,63 @@ const FEEDBACKS = [
 
 export default function CustomerFeedback() {
   const { t } = useTranslation()
-  const [activeSrc, setActiveSrc] = useState(null)
+  const [currentIndex, setCurrentIndex] = useState(0)
+  const [zoomIndex, setZoomIndex] = useState(null)
+  const [direction, setDirection] = useState(0) // -1 pour gauche, 1 pour droite
+
+  // Auto-play toutes les 8 secondes
+  useEffect(() => {
+    const timer = setInterval(() => {
+      handleNext()
+    }, 8000)
+    return () => clearInterval(timer)
+  }, [currentIndex])
+
+  const handleNext = () => {
+    setDirection(1)
+    setCurrentIndex((prev) => (prev + 1) % FEEDBACKS.length)
+  }
+
+  const handlePrev = () => {
+    setDirection(-1)
+    setCurrentIndex((prev) => (prev - 1 + FEEDBACKS.length) % FEEDBACKS.length)
+  }
+
+  const handleZoomNext = (e) => {
+    e.stopPropagation()
+    setZoomIndex((prev) => (prev + 1) % FEEDBACKS.length)
+  }
+
+  const handleZoomPrev = (e) => {
+    e.stopPropagation()
+    setZoomIndex((prev) => (prev - 1 + FEEDBACKS.length) % FEEDBACKS.length)
+  }
+
+  const slideVariants = {
+    enter: (dir) => ({
+      x: dir > 0 ? 150 : -150,
+      opacity: 0,
+    }),
+    center: {
+      x: 0,
+      opacity: 1,
+    },
+    exit: (dir) => ({
+      x: dir < 0 ? 150 : -150,
+      opacity: 0,
+    }),
+  }
+
+  const activeFeedback = FEEDBACKS[currentIndex]
 
   return (
-    <section id="feedback" className="py-20 bg-white">
+    <section id="feedback" className="py-20 bg-gray-50 border-t border-gray-100 overflow-hidden">
       <div className="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8">
         <motion.div
           initial={{ opacity: 0, y: 20 }}
           whileInView={{ opacity: 1, y: 0 }}
           viewport={{ once: true }}
-          className="text-center mb-16"
+          className="text-center mb-12"
         >
           <div className="inline-flex items-center gap-2 px-4 py-2 rounded-full bg-primary-50 text-primary-700 text-sm font-semibold mb-4">
             <MessageSquare className="w-4 h-4" />
@@ -43,69 +90,141 @@ export default function CustomerFeedback() {
           </p>
         </motion.div>
 
-        <div className="grid md:grid-cols-2 gap-10 max-w-4xl mx-auto">
-          {FEEDBACKS.map((fb, idx) => (
-            <motion.div
-              key={idx}
-              initial={{ opacity: 0, scale: 0.95 }}
-              whileInView={{ opacity: 1, scale: 1 }}
-              viewport={{ once: true }}
-              transition={{ delay: idx * 0.2 }}
-              onClick={() => setActiveSrc(fb.src)}
-              className="group relative cursor-pointer overflow-hidden rounded-3xl bg-gray-50 border-2 border-gray-100 shadow-md p-4 flex flex-col items-center justify-center hover:shadow-xl hover:border-primary-200 transition-all duration-300"
-            >
-              <div className="w-full flex items-center justify-between px-3 pb-3 border-b border-gray-200 mb-4">
-                <span className="font-semibold text-gray-700">{fb.user}</span>
-                <span className="text-xs bg-gray-200 text-gray-600 px-2.5 py-1 rounded-full uppercase tracking-wider font-bold">
-                  {fb.lang}
-                </span>
-              </div>
+        {/* Conteneur du Carrousel */}
+        <div className="relative max-w-md mx-auto px-4 sm:px-12">
+          {/* Carte Principale */}
+          <div className="relative aspect-[9/16] max-h-[500px] w-full bg-white rounded-3xl border border-gray-100 shadow-xl p-4 sm:p-6 flex flex-col justify-between overflow-hidden group">
+            <AnimatePresence initial={false} custom={direction} mode="wait">
+              <motion.div
+                key={currentIndex}
+                custom={direction}
+                variants={slideVariants}
+                initial="enter"
+                animate="center"
+                exit="exit"
+                transition={{
+                  x: { type: "spring", stiffness: 300, damping: 30 },
+                  opacity: { duration: 0.2 },
+                }}
+                className="w-full h-full flex flex-col justify-between"
+              >
+                {/* En-tête de la carte */}
+                <div className="w-full flex items-center justify-between pb-3 border-b border-gray-100 mb-4">
+                  <span className="font-bold text-gray-800 text-sm sm:text-base">{activeFeedback.user}</span>
+                  <span className="text-xs bg-primary-50 text-primary-700 px-3 py-1 rounded-full uppercase tracking-wider font-bold border border-primary-100">
+                    {activeFeedback.lang}
+                  </span>
+                </div>
 
-              <div className="relative w-full aspect-[9/16] max-h-[420px] overflow-hidden rounded-2xl border border-gray-200 flex items-center justify-center bg-white">
-                <img
-                  src={fb.src}
-                  alt={`Feedback ${fb.lang}`}
-                  className="w-full h-full object-cover transition-transform duration-500 group-hover:scale-102"
-                />
-                <div className="absolute inset-0 bg-black/40 opacity-0 group-hover:opacity-100 transition-opacity flex items-center justify-center">
-                  <div className="bg-white/95 text-gray-900 px-4 py-2 rounded-xl flex items-center gap-2 font-semibold shadow-lg scale-90 group-hover:scale-100 transition-transform duration-300">
-                    <ZoomIn className="w-5 h-5 text-primary-600" />
-                    {t('gallery.zoom')}
+                {/* Capture d'écran de l'avis */}
+                <div
+                  onClick={() => setZoomIndex(currentIndex)}
+                  className="relative flex-1 w-full overflow-hidden rounded-2xl border border-gray-100 flex items-center justify-center bg-gray-50 cursor-zoom-in"
+                >
+                  <img
+                    src={activeFeedback.src}
+                    alt={`Feedback ${activeFeedback.lang}`}
+                    className="w-full h-full object-cover select-none"
+                  />
+                  <div className="absolute inset-0 bg-black/30 opacity-0 group-hover:opacity-100 transition-opacity duration-300 flex items-center justify-center">
+                    <div className="bg-white/95 text-gray-900 px-4 py-2 rounded-xl flex items-center gap-2 font-semibold shadow-lg scale-90 group-hover:scale-100 transition-transform duration-300">
+                      <ZoomIn className="w-5 h-5 text-primary-600" />
+                      {t('gallery.zoom')}
+                    </div>
                   </div>
                 </div>
-              </div>
-            </motion.div>
-          ))}
+
+                {/* Texte de l'avis */}
+                <p className="mt-4 text-xs sm:text-sm text-gray-500 italic text-center px-2 line-clamp-2">
+                  "{activeFeedback.snippet}"
+                </p>
+              </motion.div>
+            </AnimatePresence>
+          </div>
+
+          {/* Flèches de navigation */}
+          <button
+            onClick={handlePrev}
+            className="absolute left-[-15px] sm:left-[-25px] top-1/2 -translate-y-1/2 bg-white hover:bg-primary-50 text-gray-700 hover:text-primary-600 p-3 rounded-full shadow-lg border border-gray-100 transition-all z-10 hover:scale-110"
+            aria-label="Avis précédent"
+          >
+            <ChevronLeft className="w-5 h-5" />
+          </button>
+          <button
+            onClick={handleNext}
+            className="absolute right-[-15px] sm:right-[-25px] top-1/2 -translate-y-1/2 bg-white hover:bg-primary-50 text-gray-700 hover:text-primary-600 p-3 rounded-full shadow-lg border border-gray-100 transition-all z-10 hover:scale-110"
+            aria-label="Avis suivant"
+          >
+            <ChevronRight className="w-5 h-5" />
+          </button>
+
+          {/* Points indicateurs (dots) */}
+          <div className="flex justify-center gap-2 mt-6">
+            {FEEDBACKS.map((_, idx) => (
+              <button
+                key={idx}
+                onClick={() => {
+                  setDirection(idx > currentIndex ? 1 : -1)
+                  setCurrentIndex(idx)
+                }}
+                className={`h-2.5 rounded-full transition-all duration-300 ${
+                  idx === currentIndex ? 'bg-primary-600 w-6' : 'bg-gray-300 w-2.5 hover:bg-gray-400'
+                }`}
+                aria-label={`Slide ${idx + 1}`}
+              />
+            ))}
+          </div>
         </div>
       </div>
 
+      {/* Modale Lightbox Zoomée avec boutons Album */}
       <AnimatePresence>
-        {activeSrc && (
+        {zoomIndex !== null && (
           <motion.div
             initial={{ opacity: 0 }}
             animate={{ opacity: 1 }}
             exit={{ opacity: 0 }}
-            className="fixed inset-0 z-50 bg-black/95 flex items-center justify-center p-4"
-            onClick={() => setActiveSrc(null)}
+            className="fixed inset-0 z-[100] bg-black/95 flex items-center justify-center p-4"
+            onClick={() => setZoomIndex(null)}
           >
             <button
-              onClick={() => setActiveSrc(null)}
+              onClick={() => setZoomIndex(null)}
               className="absolute top-6 right-6 text-white/80 hover:text-white bg-white/10 hover:bg-white/20 p-3 rounded-full transition-colors z-50"
             >
               <X className="w-6 h-6" />
             </button>
+
+            {/* Contrôles de la modale */}
+            <button
+              onClick={handleZoomPrev}
+              className="absolute left-4 sm:left-8 text-white/80 hover:text-white bg-white/10 hover:bg-white/20 p-3 rounded-full transition-colors z-50 hover:scale-105"
+            >
+              <ChevronLeft className="w-8 h-8" />
+            </button>
+            <button
+              onClick={handleZoomNext}
+              className="absolute right-4 sm:right-8 text-white/80 hover:text-white bg-white/10 hover:bg-white/20 p-3 rounded-full transition-colors z-50 hover:scale-105"
+            >
+              <ChevronRight className="w-8 h-8" />
+            </button>
+
             <motion.div
               initial={{ scale: 0.95, y: 20 }}
               animate={{ scale: 1, y: 0 }}
               exit={{ scale: 0.95, y: 20 }}
-              className="relative max-w-lg w-full max-h-[90vh] p-2 flex items-center justify-center"
+              className="relative max-w-lg w-full max-h-[85vh] p-2 flex flex-col items-center justify-center"
               onClick={(e) => e.stopPropagation()}
             >
               <img
-                src={activeSrc}
+                src={FEEDBACKS[zoomIndex].src}
                 alt="Zoomed feedback"
-                className="max-w-full max-h-[85vh] object-contain rounded-2xl shadow-2xl"
+                className="max-w-full max-h-[75vh] object-contain rounded-2xl shadow-2xl select-none"
               />
+              <div className="mt-4 text-center text-white/80">
+                <span className="font-bold">{FEEDBACKS[zoomIndex].user}</span>
+                <span className="mx-2">•</span>
+                <span className="uppercase text-xs bg-white/15 px-2 py-0.5 rounded font-semibold">{FEEDBACKS[zoomIndex].lang}</span>
+              </div>
             </motion.div>
           </motion.div>
         )}

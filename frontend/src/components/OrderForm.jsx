@@ -2,7 +2,7 @@ import { useState } from 'react'
 import { useTranslation } from 'react-i18next'
 import { useForm } from 'react-hook-form'
 import { motion } from 'framer-motion'
-import { Send, CheckCircle, Banknote, Loader2 } from 'lucide-react'
+import { Send, CheckCircle, Banknote, Loader2, Home, Briefcase } from 'lucide-react'
 import { DELIVERY_FEE, getProductPrice } from '../utils/constants'
 import { WILAYAS_DATA } from '../utils/wilayas_data'
 import ProductSelector from './ProductSelector'
@@ -14,6 +14,7 @@ export default function OrderForm() {
   const [submitted, setSubmitted] = useState(false)
   const [submitting, setSubmitting] = useState(false)
   const [orderData, setOrderData] = useState(null)
+  const [deliveryType, setDeliveryType] = useState('home')
 
   const {
     register,
@@ -46,8 +47,15 @@ export default function OrderForm() {
           : selectedWilaya.fr
       : data.wilaya
 
+    // Handle delivery address for office (if optional & left blank)
+    let finalAddress = data.address ? data.address.trim() : ''
+    if (deliveryType === 'office' && !finalAddress) {
+      finalAddress = t('order.deliveryOffice') || 'Livraison au bureau'
+    }
+
     const order = {
       ...data,
+      address: finalAddress,
       wilaya: wilayaName,
       product_type: productId,
       product_name: t(`products.${productId}.name`),
@@ -273,14 +281,47 @@ export default function OrderForm() {
 
             <div>
               <label className="block text-sm font-semibold text-gray-700 mb-2">
-                {t('order.address')} *
+                {t('order.deliveryMethod')} *
+              </label>
+              <div className="grid grid-cols-2 gap-4 mb-4">
+                <button
+                  type="button"
+                  onClick={() => setDeliveryType('home')}
+                  className={`flex items-center justify-center gap-2 p-3.5 rounded-xl border-2 font-semibold transition-all cursor-pointer ${
+                    deliveryType === 'home'
+                      ? 'border-primary-600 bg-primary-50 text-primary-700 shadow-sm ring-1 ring-primary-500'
+                      : 'border-gray-200 bg-white text-gray-600 hover:border-gray-300'
+                  }`}
+                >
+                  <Home className="w-5 h-5" />
+                  <span>{t('order.deliveryHome')}</span>
+                </button>
+                <button
+                  type="button"
+                  onClick={() => setDeliveryType('office')}
+                  className={`flex items-center justify-center gap-2 p-3.5 rounded-xl border-2 font-semibold transition-all cursor-pointer ${
+                    deliveryType === 'office'
+                      ? 'border-primary-600 bg-primary-50 text-primary-700 shadow-sm ring-1 ring-primary-500'
+                      : 'border-gray-200 bg-white text-gray-600 hover:border-gray-300'
+                  }`}
+                >
+                  <Briefcase className="w-5 h-5" />
+                  <span>{t('order.deliveryOffice')}</span>
+                </button>
+              </div>
+            </div>
+
+            <div>
+              <label className="block text-sm font-semibold text-gray-700 mb-2">
+                {deliveryType === 'home' ? `${t('order.address')} *` : t('order.addressOptional')}
               </label>
               <textarea
                 rows={3}
-                {...register('address', { required: t('order.required') })}
-                className={inputClass(errors.address)}
+                {...register('address', { required: deliveryType === 'home' ? t('order.required') : false })}
+                className={inputClass(deliveryType === 'home' ? errors.address : null)}
+                placeholder={deliveryType === 'home' ? (currentLang === 'ar' ? "مثال: حي 50 مسكن، عمارة ب، رقم 4..." : "Ex: 12 Rue de la Liberté...") : (currentLang === 'ar' ? "اسم الشركة، رقم المكتب... (اختياري)" : "Nom de l'entreprise, Bureau N°... (Optionnel)")}
               />
-              {errors.address && (
+              {deliveryType === 'home' && errors.address && (
                 <p className="text-red-500 text-sm mt-1">{errors.address.message}</p>
               )}
             </div>

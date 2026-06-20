@@ -12,10 +12,12 @@
     "contact": "Contact"
   },
   "hero": {
-    "title": "Deux livres pour le prix d'un seul",
+    "title": "Deux livres pour le prix de 2000 DA",
     "price": "2000 DA le pack",
     "badge": "Pack promo : les deux livres ensemble avec économie",
     "cta": "Commander maintenant",
+    "bonus": "Pack bonus : les deux livres + support pratique + livraison rapide",
+    "bonusDescription": "Bénéficiez d’un guide complet, d’une remise attractive et d’une commande facile avec livraison à domicile.",
     "stock": "Offre limitée — Plus que {{count}} exemplaires disponibles !",
     "perPack": "par pack",
     "orIndividual": "Ou commandez chaque livre séparément :"
@@ -28,12 +30,12 @@
     "units": "exemplaires",
     "subtotal": "Sous-total",
     "book1": {
-      "name": "Matériels de laboratoire",
-      "short": "Matériels et outils de laboratoire d'analyse médicale"
+      "name": "Matériels et outils de laboratoire",
+      "short": "Matériels et outils de laboratoire"
     },
     "book2": {
-      "name": "Techniques de dosages",
-      "short": "Guide pratique des analyses de biologie médicale"
+      "name": "Guide pratique des techniques des analyses médicales",
+      "short": "Guide pratique des techniques des analyses médicales"
     },
     "pack": {
       "name": "Les deux ensemble",
@@ -47,10 +49,10 @@
   },
   "description": {
     "title": "Contenu des livres",
-    "subtitle": "Deux ouvrages complets pour maîtriser la biologie et les analyses médicales",
+    "subtitle": "Deux ouvrages complets pour maîtriser et savoir tous sur les prélèvements sanguins et techniques de dosage des analyses biochimiques, hématologiques et sérologiques — 100 % pratique — et matériel et outils utilisés dans les laboratoires d'analyse médicale",
     "orderBook": "Commander — {{price}} DA",
     "book1": {
-      "title": "Livre 1 — Matériels de laboratoire",
+      "title": "Livre 1 — Matériels et outils de laboratoire",
       "items": [
         "Guide complet du matériel et des outils de laboratoire",
         "Présentation des automates (FNS, Ionogramme, Biochimie, etc.)",
@@ -61,7 +63,7 @@
       ]
     },
     "book2": {
-      "title": "Livre 2 — Techniques de dosages",
+      "title": "Livre 2 — Guide pratique des techniques des analyses médicales",
       "items": [
         "Plus de 110 techniques de dosage et analyses détaillées",
         "Techniques de prélèvement sanguin et choix des anticoagulants",
@@ -75,7 +77,7 @@
   },
   "showcase": {
     "title": "Aperçu des Livres",
-    "subtitle": "Photos réelles et illustrations détaillées de nos ouvrages de biologie"
+    "subtitle": "Photos réelles et illustrations détaillées de nos ouvrages de biologie médicale"
   },
   "feedback": {
     "title": "Avis de nos Acheteurs",
@@ -125,6 +127,10 @@
     "wilaya": "Wilaya",
     "commune": "Commune",
     "address": "Adresse complète",
+    "addressOptional": "Adresse complète (Optionnelle)",
+    "deliveryHome": "Livraison à domicile",
+    "deliveryOffice": "Livraison au bureau",
+    "deliveryMethod": "Type de livraison",
     "quantity": "Quantité",
     "product": "Produit",
     "selectWilaya": "Sélectionnez une wilaya",
@@ -160,7 +166,7 @@
       },
       {
         "q": "Quel est le délai de livraison ?",
-        "a": "La livraison prend généralement entre 2 et 5 jours ouvrables selon votre wilaya."
+        "a": "La livraison prend au maximum 48 heures selon votre wilaya."
       },
       {
         "q": "Le livre est-il en couleur ?",
@@ -173,7 +179,7 @@
     ]
   },
   "footer": {
-    "copyright": "© {{year}} BioBooks. Tous droits réservés.",
+    "copyright": "© {{year}} BiologyBooks. Tous droits réservés.",
     "followUs": "Suivez-nous"
   },
   "whatsapp": {

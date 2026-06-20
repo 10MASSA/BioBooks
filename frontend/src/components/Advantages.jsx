@@ -34,11 +34,12 @@ export default function Advantages() {
             return (
               <motion.div
                 key={item}
-                initial={{ opacity: 0, y: 20 }}
+                initial={{ opacity: 0, y: 30 }}
                 whileInView={{ opacity: 1, y: 0 }}
-                viewport={{ once: true }}
-                transition={{ delay: i * 0.08 }}
-                className="bg-white/10 backdrop-blur-sm border border-white/10 rounded-2xl p-6 hover:bg-white/15 transition-colors"
+                viewport={{ once: true, margin: "-50px" }}
+                transition={{ duration: 0.5, delay: i * 0.06 }}
+                whileHover={{ y: -6, scale: 1.02 }}
+                className="bg-white/10 backdrop-blur-sm border border-white/10 rounded-2xl p-6 hover:bg-white/15 cursor-pointer transition-all duration-300"
               >
                 <div className="w-12 h-12 bg-accent-500/20 rounded-xl flex items-center justify-center mb-4">
                   <Icon className="w-6 h-6 text-accent-400" />
