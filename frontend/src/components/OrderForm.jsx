@@ -3,7 +3,7 @@ import { useTranslation } from 'react-i18next'
 import { useForm } from 'react-hook-form'
 import { motion } from 'framer-motion'
 import { Send, CheckCircle, Banknote, Loader2, Home, Briefcase } from 'lucide-react'
-import { DELIVERY_FEE, getProductPrice } from '../utils/constants'
+import { DELIVERY_FEE, getProductPrice, API_URL } from '../utils/constants'
 import { WILAYAS_DATA } from '../utils/wilayas_data'
 import ProductSelector from './ProductSelector'
 
@@ -27,6 +27,7 @@ export default function OrderForm() {
 
   const selectedWilayaCode = watch('wilaya')
   const currentLang = i18n.language || 'fr'
+  const apiBase = API_URL ? API_URL.replace(/\/+$/, '') : ''
 
   const selectedWilayaObj = WILAYAS_DATA.find((w) => w.code === selectedWilayaCode)
   const communesList = selectedWilayaObj ? selectedWilayaObj.communes : []
@@ -67,7 +68,7 @@ export default function OrderForm() {
     }
 
     try {
-      const res = await fetch('/api/orders', {
+      const res = await fetch(`${apiBase}/api/orders`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify(order),

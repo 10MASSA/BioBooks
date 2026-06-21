@@ -4,6 +4,7 @@ import {
   LogOut, Download, Trash2, RefreshCw, Lock, Package, Bell, X,
 } from 'lucide-react'
 import { motion, AnimatePresence } from 'framer-motion'
+import { API_URL } from '../utils/constants'
 
 const STATUSES = ['pending', 'confirmed', 'shipped', 'delivered', 'cancelled']
 
@@ -46,12 +47,13 @@ export default function Admin() {
   const [orders, setOrders] = useState([])
   const [loading, setLoading] = useState(false)
   const [newOrderToast, setNewOrderToast] = useState('')
+  const apiBase = API_URL ? API_URL.replace(/\/+$/, '') : ''
 
   const fetchOrders = useCallback(async () => {
     if (!token) return
     setLoading(true)
     try {
-      const res = await fetch('/api/admin/orders', {
+      const res = await fetch(`${apiBase}/api/admin/orders`, {
         headers: { Authorization: `Bearer ${token}` },
       })
       if (res.status === 401) {
@@ -103,7 +105,7 @@ export default function Admin() {
     e.preventDefault()
     setLoginError('')
     try {
-      const res = await fetch('/api/admin/login', {
+      const res = await fetch(`${apiBase}/api/admin/login`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ password }),
@@ -127,7 +129,7 @@ export default function Admin() {
   }
 
   const updateStatus = async (id, status) => {
-    await fetch(`/api/admin/orders/${id}/status`, {
+    await fetch(`${apiBase}/api/admin/orders/${id}/status`, {
       method: 'PATCH',
       headers: {
         'Content-Type': 'application/json',
@@ -140,7 +142,7 @@ export default function Admin() {
 
   const deleteOrder = async (id) => {
     if (!confirm(t('admin.confirmDelete'))) return
-    await fetch(`/api/admin/orders/${id}`, {
+    await fetch(`${apiBase}/api/admin/orders/${id}`, {
       method: 'DELETE',
       headers: { Authorization: `Bearer ${token}` },
     })
@@ -148,7 +150,7 @@ export default function Admin() {
   }
 
   const exportExcel = () => {
-    window.open(`/api/admin/orders/export?token=${token}`, '_blank')
+    window.open(`${apiBase}/api/admin/orders/export?token=${token}`, '_blank')
   }
 
   if (!token) {

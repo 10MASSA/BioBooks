@@ -1,5 +1,5 @@
 export const DELIVERY_FEE = 450
-export const API_URL = import.meta.env.VITE_API_URL || ''
+export const API_URL = import.meta.env.VITE_API_URL || 'https://biobooks-production.up.railway.app'
 
 export const PRODUCTS = {
   book1: {
