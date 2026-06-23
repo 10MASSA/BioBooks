@@ -14,7 +14,7 @@ export const PRODUCTS = {
   },
   pack: {
     id: 'pack',
-    price: 2000,
+    price: 1600,
     image: '/images/pack-main.svg',
     originalPrice: 2300,
   },
