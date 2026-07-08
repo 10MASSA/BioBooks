@@ -12,7 +12,8 @@ const ICONS = [
 
 export default function Advantages() {
   const { t } = useTranslation()
-  const items = t('advantages.items', { returnObjects: true })
+  const rawItems = t('advantages.items', { returnObjects: true })
+  const items = Array.isArray(rawItems) ? rawItems : []
 
   return (
     <section className="py-20 bg-primary-900 text-white">

@@ -1,9 +1,10 @@
 import { useState, useEffect } from 'react'
 import { useTranslation } from 'react-i18next'
 import { motion, AnimatePresence } from 'framer-motion'
-import { MessageSquare, ZoomIn, X, ChevronLeft, ChevronRight } from 'lucide-react'
+import { MessageSquare, ZoomIn, X, ChevronLeft, ChevronRight, Star } from 'lucide-react'
+import { useCms } from '../context/CmsContext'
 
-const FEEDBACKS = [
+const FEEDBACKS_DEFAULT = [
   {
     src: '/images/feedback-ar.jpg',
     lang: 'ar',
@@ -18,8 +19,31 @@ const FEEDBACKS = [
   },
 ]
 
+const getFeedbackImage = (testimonial, fallbackIndex = 0) => {
+  if (testimonial?.image_url) return testimonial.image_url
+  return fallbackIndex % 2 === 0 ? '/images/feedback-ar.jpg' : '/images/feedback-fr.jpg'
+}
+
 export default function CustomerFeedback() {
-  const { t } = useTranslation()
+  const { t, i18n } = useTranslation()
+  const currentLang = i18n.language || 'fr'
+  const { getTestimonials, cms } = useCms()
+
+  // Use DB testimonials if available, otherwise fallback
+  const dbTestimonials = getTestimonials(currentLang)
+  const useDbData = dbTestimonials.length > 0
+
+  // Convert DB testimonials to the same format as FEEDBACKS_DEFAULT
+  const FEEDBACKS = useDbData
+    ? dbTestimonials.map((t, index) => ({
+        src: getFeedbackImage(t, index),
+        user: t.name,
+        snippet: t.text,
+        rating: t.rating,
+        isText: true,
+      }))
+    : FEEDBACKS_DEFAULT
+
   const [currentIndex, setCurrentIndex] = useState(0)
   const [zoomIndex, setZoomIndex] = useState(null)
   const [direction, setDirection] = useState(0) // -1 pour gauche, 1 pour droite
@@ -121,17 +145,26 @@ export default function CustomerFeedback() {
                   onClick={() => setZoomIndex(currentIndex)}
                   className="relative flex-1 w-full overflow-hidden rounded-2xl border border-gray-100 flex items-center justify-center bg-gray-50 cursor-zoom-in"
                 >
-                  <img
-                    src={activeFeedback.src}
-                    alt={`Feedback ${activeFeedback.lang}`}
-                    className="w-full h-full object-cover select-none"
-                  />
-                  <div className="absolute inset-0 bg-black/30 opacity-0 group-hover:opacity-100 transition-opacity duration-300 flex items-center justify-center">
-                    <div className="bg-white/95 text-gray-900 px-4 py-2 rounded-xl flex items-center gap-2 font-semibold shadow-lg scale-90 group-hover:scale-100 transition-transform duration-300">
-                      <ZoomIn className="w-5 h-5 text-primary-600" />
-                      {t('gallery.zoom')}
+                  {activeFeedback.src ? (
+                    <>
+                      <img
+                        src={activeFeedback.src}
+                        alt={`Feedback ${activeFeedback.lang}`}
+                        className="w-full h-full object-cover select-none"
+                      />
+                      <div className="absolute inset-0 bg-black/30 opacity-0 group-hover:opacity-100 transition-opacity duration-300 flex items-center justify-center">
+                        <div className="bg-white/95 text-gray-900 px-4 py-2 rounded-xl flex items-center gap-2 font-semibold shadow-lg scale-90 group-hover:scale-100 transition-transform duration-300">
+                          <ZoomIn className="w-5 h-5 text-primary-600" />
+                          {t('gallery.zoom')}
+                        </div>
+                      </div>
+                    </>
+                  ) : (
+                    <div className="text-center px-6 text-gray-400">
+                      <p className="text-sm font-semibold">{t('feedback.textOnly')}</p>
+                      <p className="text-xs mt-1">{t('feedback.noImage')}</p>
                     </div>
-                  </div>
+                  )}
                 </div>
 
                 {/* Texte de l'avis */}
@@ -146,14 +179,14 @@ export default function CustomerFeedback() {
           <button
             onClick={handlePrev}
             className="absolute left-[-15px] sm:left-[-25px] top-1/2 -translate-y-1/2 bg-white hover:bg-primary-50 text-gray-700 hover:text-primary-600 p-3 rounded-full shadow-lg border border-gray-100 transition-all z-10 hover:scale-110"
-            aria-label="Avis précédent"
+            aria-label={t('feedback.previous')}
           >
             <ChevronLeft className="w-5 h-5" />
           </button>
           <button
             onClick={handleNext}
             className="absolute right-[-15px] sm:right-[-25px] top-1/2 -translate-y-1/2 bg-white hover:bg-primary-50 text-gray-700 hover:text-primary-600 p-3 rounded-full shadow-lg border border-gray-100 transition-all z-10 hover:scale-110"
-            aria-label="Avis suivant"
+            aria-label={t('feedback.next')}
           >
             <ChevronRight className="w-5 h-5" />
           </button>
@@ -170,7 +203,7 @@ export default function CustomerFeedback() {
                 className={`h-2.5 rounded-full transition-all duration-300 ${
                   idx === currentIndex ? 'bg-primary-600 w-6' : 'bg-gray-300 w-2.5 hover:bg-gray-400'
                 }`}
-                aria-label={`Slide ${idx + 1}`}
+                aria-label={t('feedback.slide', { number: idx + 1 })}
               />
             ))}
           </div>
@@ -215,11 +248,18 @@ export default function CustomerFeedback() {
               className="relative max-w-lg w-full max-h-[85vh] p-2 flex flex-col items-center justify-center"
               onClick={(e) => e.stopPropagation()}
             >
-              <img
-                src={FEEDBACKS[zoomIndex].src}
-                alt="Zoomed feedback"
-                className="max-w-full max-h-[75vh] object-contain rounded-2xl shadow-2xl select-none"
-              />
+              {FEEDBACKS[zoomIndex].src ? (
+                <img
+                  src={FEEDBACKS[zoomIndex].src}
+                  alt="Zoomed feedback"
+                  className="max-w-full max-h-[75vh] object-contain rounded-2xl shadow-2xl select-none"
+                />
+              ) : (
+                <div className="w-full max-w-md rounded-2xl border border-white/20 bg-white/10 p-8 text-center text-white/80">
+                  <p className="font-semibold">{t('feedback.textOnly')}</p>
+                  <p className="text-sm mt-2">{t('feedback.noImage')}</p>
+                </div>
+              )}
               <div className="mt-4 text-center text-white/80">
                 <span className="font-bold">{FEEDBACKS[zoomIndex].user}</span>
                 <span className="mx-2">•</span>

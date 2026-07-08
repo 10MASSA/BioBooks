@@ -25,7 +25,8 @@ const COLORS = [
 
 export default function TargetAudience() {
   const { t } = useTranslation()
-  const fields = t('audience.fields', { returnObjects: true })
+  const rawFields = t('audience.fields', { returnObjects: true })
+  const fields = Array.isArray(rawFields) ? rawFields : []
 
   return (
     <section className="py-20 bg-gradient-to-b from-gray-50 to-white">

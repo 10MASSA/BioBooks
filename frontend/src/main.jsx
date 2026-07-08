@@ -4,11 +4,17 @@ import { BrowserRouter } from 'react-router-dom'
 import './i18n'
 import './index.css'
 import App from './App.jsx'
+import { ProductsProvider } from './context/ProductsContext'
+import { CmsProvider } from './context/CmsContext'
 
 createRoot(document.getElementById('root')).render(
   <StrictMode>
-    <BrowserRouter>
-      <App />
-    </BrowserRouter>
+    <ProductsProvider>
+      <CmsProvider>
+        <BrowserRouter>
+          <App />
+        </BrowserRouter>
+      </CmsProvider>
+    </ProductsProvider>
   </StrictMode>,
 )

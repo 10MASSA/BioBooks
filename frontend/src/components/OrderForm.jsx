@@ -4,6 +4,7 @@ import { useForm } from 'react-hook-form'
 import { motion } from 'framer-motion'
 import { Send, CheckCircle, Banknote, Loader2, Home, Briefcase } from 'lucide-react'
 import { DELIVERY_FEE, getProductPrice, API_URL } from '../utils/constants'
+import { useProducts } from '../context/ProductsContext'
 import { WILAYAS_DATA } from '../utils/wilayas_data'
 import ProductSelector from './ProductSelector'
 
@@ -15,6 +16,7 @@ export default function OrderForm() {
   const [submitting, setSubmitting] = useState(false)
   const [orderData, setOrderData] = useState(null)
   const [deliveryType, setDeliveryType] = useState('home')
+  const { products, loading } = useProducts()
 
   const {
     register,
@@ -32,7 +34,8 @@ export default function OrderForm() {
   const selectedWilayaObj = WILAYAS_DATA.find((w) => w.code === selectedWilayaCode)
   const communesList = selectedWilayaObj ? selectedWilayaObj.communes : []
 
-  const unitPrice = getProductPrice(productId)
+  const dbProduct = !loading && products[productId]
+  const unitPrice = dbProduct?.price ? dbProduct.price : getProductPrice(productId)
   const subtotal = unitPrice * quantity
   const total = subtotal + DELIVERY_FEE
 
@@ -59,7 +62,12 @@ export default function OrderForm() {
       address: finalAddress,
       wilaya: wilayaName,
       product_type: productId,
-      product_name: t(`products.${productId}.name`),
+      product_name: (() => {
+        if (!dbProduct?.name) return t(`products.${productId}.name`)
+        if (currentLang === 'en') return dbProduct.name_en || t(`products.${productId}.name`)
+        if (currentLang === 'ar') return dbProduct.name_ar || t(`products.${productId}.name`)
+        return dbProduct.name
+      })(),
       quantity,
       unit_price: unitPrice,
       subtotal,
@@ -331,7 +339,13 @@ export default function OrderForm() {
               <div className="flex justify-between text-gray-700">
                 <span>{t('order.product')}</span>
                 <span className="font-semibold text-end max-w-[60%]">
-                  {t(`products.${productId}.name`)}
+                  {(() => {
+                    const dbP = products[productId]
+                    if (!dbP?.name) return t(`products.${productId}.name`)
+                    if (currentLang === 'en') return dbP.name_en || t(`products.${productId}.name`)
+                    if (currentLang === 'ar') return dbP.name_ar || t(`products.${productId}.name`)
+                    return dbP.name
+                  })()}
                 </span>
               </div>
               <div className="flex justify-between text-gray-700">

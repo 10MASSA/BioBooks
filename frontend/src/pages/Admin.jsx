@@ -39,8 +39,12 @@ const playNotificationSound = () => {
   }
 }
 
+import ProductsTab from '../components/ProductsTab'
+import CmsTab from '../components/CmsTab'
+
 export default function Admin() {
   const { t } = useTranslation()
+  const [activeTab, setActiveTab] = useState('orders')
   const [token, setToken] = useState(localStorage.getItem('admin_token') || '')
   const [password, setPassword] = useState('')
   const [loginError, setLoginError] = useState('')
@@ -243,10 +247,33 @@ export default function Admin() {
             </button>
           </div>
         </div>
+        
+        {/* Tabs Navigation */}
+        <div className="max-w-7xl mx-auto px-4 mt-4 flex gap-4 border-b">
+          <button 
+            onClick={() => setActiveTab('orders')}
+            className={`pb-2 px-2 font-bold text-sm transition-colors ${activeTab === 'orders' ? 'border-b-2 border-primary-600 text-primary-600' : 'text-gray-500 hover:text-gray-700'}`}
+          >
+            📦 Commandes
+          </button>
+          <button 
+            onClick={() => setActiveTab('products')}
+            className={`pb-2 px-2 font-bold text-sm transition-colors ${activeTab === 'products' ? 'border-b-2 border-primary-600 text-primary-600' : 'text-gray-500 hover:text-gray-700'}`}
+          >
+            🏷️ Produits
+          </button>
+          <button 
+            onClick={() => setActiveTab('cms')}
+            className={`pb-2 px-2 font-bold text-sm transition-colors ${activeTab === 'cms' ? 'border-b-2 border-primary-600 text-primary-600' : 'text-gray-500 hover:text-gray-700'}`}
+          >
+            🌐 Contenu du Site
+          </button>
+        </div>
       </header>
 
-      <main className="max-w-7xl mx-auto px-4 py-8">
-        <h2 className="text-lg font-semibold text-gray-700 mb-4">
+      {activeTab === 'orders' ? (
+        <main className="max-w-7xl mx-auto px-4 py-8">
+          <h2 className="text-lg font-semibold text-gray-700 mb-4">
           {t('admin.orders')} ({orders.length})
         </h2>
 
@@ -312,6 +339,15 @@ export default function Admin() {
           </div>
         )}
       </main>
+      ) : activeTab === 'products' ? (
+        <main className="max-w-7xl mx-auto py-4">
+          <ProductsTab token={token} />
+        </main>
+      ) : (
+        <main className="max-w-7xl mx-auto py-4">
+          <CmsTab token={token} />
+        </main>
+      )}
     </div>
   )
 }

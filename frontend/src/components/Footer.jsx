@@ -17,9 +17,6 @@ export default function Footer() {
               </div>
               <span className="font-bold text-xl">BiologyBooks</span>
             </div>
-            <p className="text-gray-400 text-sm">
-              {t('hero.title')}
-            </p>
           </div>
 
           <div>

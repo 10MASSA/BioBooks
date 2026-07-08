@@ -12,7 +12,7 @@
     "contact": "Contact"
   },
   "hero": {
-    "title": "Two books for the price of 2000 DA",
+    "title": "Two books for the price of {{price}} DA",
     "price": "2000 DA for the pack",
     "badge": "Promo pack: both books together with savings",
     "cta": "Order now",
@@ -77,11 +77,18 @@
   },
   "showcase": {
     "title": "Books Preview",
-    "subtitle": "Real photos and detailed illustrations of our medical biology books"
+    "subtitle": "Real photos and detailed illustrations of our medical biology books",
+    "emptyStateTitle": "No image for this book",
+    "emptyStateDescription": "Add images from the admin to display them here."
   },
   "feedback": {
     "title": "Customer Feedback",
-    "subtitle": "What our buyers say about their experience with our books"
+    "subtitle": "What our buyers say about their experience with our books",
+    "previous": "Previous review",
+    "next": "Next review",
+    "slide": "Slide {{number}}",
+    "textOnly": "Text-only review",
+    "noImage": "No image is attached to this comment."
   },
   "audience": {
     "title": "Target audience",

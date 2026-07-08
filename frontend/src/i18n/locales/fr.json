@@ -12,7 +12,7 @@
     "contact": "Contact"
   },
   "hero": {
-    "title": "Deux livres pour le prix de 2000 DA",
+    "title": "Deux livres pour le prix de {{price}} DA",
     "price": "2000 DA le pack",
     "badge": "Pack promo : les deux livres ensemble avec économie",
     "cta": "Commander maintenant",
@@ -77,11 +77,18 @@
   },
   "showcase": {
     "title": "Aperçu des Livres",
-    "subtitle": "Photos réelles et illustrations détaillées de nos ouvrages de biologie médicale"
+    "subtitle": "Photos réelles et illustrations détaillées de nos ouvrages de biologie médicale",
+    "emptyStateTitle": "Aucune image pour ce livre",
+    "emptyStateDescription": "Ajoutez des images depuis l’admin pour l’afficher ici."
   },
   "feedback": {
     "title": "Avis de nos Acheteurs",
-    "subtitle": "Ce que pensent nos clients de leur expérience avec nos livres"
+    "subtitle": "Ce que pensent nos clients de leur expérience avec nos livres",
+    "previous": "Avis précédent",
+    "next": "Avis suivant",
+    "slide": "Diapositive {{number}}",
+    "textOnly": "Avis texte uniquement",
+    "noImage": "Aucun visuel n’est associé à ce commentaire."
   },
   "audience": {
     "title": "Public cible",

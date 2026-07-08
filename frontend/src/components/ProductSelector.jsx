@@ -2,6 +2,16 @@ import { useTranslation } from 'react-i18next'
 import { motion } from 'framer-motion'
 import { Minus, Plus, BookOpen, FlaskConical, Gift, Sparkles } from 'lucide-react'
 import { PRODUCTS } from '../utils/constants'
+import { useProducts } from '../context/ProductsContext'
+
+const ICONS = [FlaskConical, BookOpen, Gift, Sparkles]
+const COLORS = [
+  'border-blue-400 bg-blue-50',
+  'border-orange-400 bg-orange-50',
+  'border-primary-400 bg-primary-50',
+  'border-green-400 bg-green-50'
+]
+const BADGES = ['bg-blue-600', 'bg-orange-600', 'bg-primary-600', 'bg-green-600']
 
 const PRODUCT_CONFIG = [
   { id: 'book1', icon: FlaskConical, color: 'border-blue-400 bg-blue-50', badge: 'bg-blue-600' },
@@ -10,9 +20,39 @@ const PRODUCT_CONFIG = [
 ]
 
 export default function ProductSelector({ productId, setProductId, quantity, setQuantity }) {
-  const { t } = useTranslation()
-  const unitPrice = PRODUCTS[productId].price
+  const { t, i18n } = useTranslation()
+  const currentLang = i18n.language || 'fr'
+  const { products, loading, productsList } = useProducts()
+  
+  // Get all active products
+  const activeProducts = productsList ? productsList.filter(p => p.is_active) : []
+  
+  // Use dynamic products if available, otherwise fall back to hardcoded config
+  const productConfig = activeProducts.length > 0 ? activeProducts.map((p, idx) => ({
+    id: p.id,
+    icon: ICONS[idx % ICONS.length],
+    color: COLORS[idx % COLORS.length],
+    badge: BADGES[idx % BADGES.length],
+    popular: idx === 0 // Mark first product as popular
+  })) : PRODUCT_CONFIG
+  
+  const dbProduct = !loading && products[productId]
+  const unitPrice = dbProduct?.price ? dbProduct.price : (PRODUCTS[productId]?.price || 0)
   const total = unitPrice * quantity
+
+  const getTranslatedName = (pId, dbP) => {
+    if (!dbP?.name) return t(`products.${pId}.name`)
+    if (currentLang === 'en') return dbP.name_en || t(`products.${pId}.name`)
+    if (currentLang === 'ar') return dbP.name_ar || t(`products.${pId}.name`)
+    return dbP.name
+  }
+
+  const getTranslatedDesc = (pId, dbP) => {
+    if (!dbP?.description) return t(`products.${pId}.short`)
+    if (currentLang === 'en') return dbP.description_en || t(`products.${pId}.short`)
+    if (currentLang === 'ar') return dbP.description_ar || t(`products.${pId}.short`)
+    return dbP.description
+  }
 
   return (
     <section id="products" className="py-20 bg-white">
@@ -29,10 +69,19 @@ export default function ProductSelector({ productId, setProductId, quantity, set
           <p className="text-gray-600">{t('products.subtitle')}</p>
         </motion.div>
 
-        <div className="grid sm:grid-cols-3 gap-4 mb-8">
-          {PRODUCT_CONFIG.map((p, idx) => {
+        <div className={`grid gap-4 mb-8 ${activeProducts.length > 3 ? 'sm:grid-cols-2 lg:grid-cols-4' : 'sm:grid-cols-3'}`}>
+          {productConfig.map((p, idx) => {
             const Icon = p.icon
-            const product = PRODUCTS[p.id]
+            const dbP = !loading && products[p.id]
+            const product = dbP ? {
+              price: dbP.price,
+              originalPrice: dbP.original_price,
+              image: dbP.image
+            } : (PRODUCTS[p.id] || { price: 0, originalPrice: null, image: '' })
+            
+            const productName = getTranslatedName(p.id, dbP)
+            const productDesc = getTranslatedDesc(p.id, dbP)
+
             const selected = productId === p.id
 
             return (
@@ -60,10 +109,10 @@ export default function ProductSelector({ productId, setProductId, quantity, set
                   <Icon className="w-5 h-5 text-white" />
                 </div>
                 <h3 className="font-bold text-gray-900 text-sm mb-1 leading-snug">
-                  {t(`products.${p.id}.name`)}
+                  {productName}
                 </h3>
                 <p className="text-xs text-gray-500 mb-3 line-clamp-2">
-                  {t(`products.${p.id}.short`)}
+                  {productDesc}
                 </p>
                 <div className="flex items-baseline gap-2">
                   <span className="text-2xl font-black text-primary-700">{product.price}</span>
@@ -89,7 +138,7 @@ export default function ProductSelector({ productId, setProductId, quantity, set
           className="bg-gradient-to-br from-primary-50 to-white border-2 border-primary-200 rounded-3xl p-6 sm:p-8 shadow-lg"
         >
           <p className="text-center text-sm font-semibold text-gray-600 mb-4">
-            {t(`products.${productId}.name`)} — {unitPrice} DA
+            {getTranslatedName(productId, dbProduct)} — {unitPrice} DA
           </p>
 
           <div className="flex items-center justify-center gap-6 mb-6">

@@ -2,6 +2,7 @@ import { useState, useEffect } from 'react'
 import { useTranslation } from 'react-i18next'
 import { Menu, X, BookOpen, Globe } from 'lucide-react'
 import { motion, AnimatePresence } from 'framer-motion'
+import { smoothScrollTo } from '../utils/smoothScroll'
 
 const LANGUAGES = [
   { code: 'ar', label: 'العربية' },
@@ -38,6 +39,7 @@ export default function Header() {
     { href: '#contact', label: t('nav.contact') },
   ]
 
+
   return (
     <header
       className={`fixed top-0 inset-x-0 z-50 transition-all duration-300 ${
@@ -60,6 +62,7 @@ export default function Header() {
               <a
                 key={link.href}
                 href={link.href}
+                onClick={(e) => smoothScrollTo(e, link.href)}
                 className={`text-sm font-medium transition-colors hover:text-primary-500 ${
                   scrolled ? 'text-gray-700' : 'text-white/90'
                 }`}
@@ -112,7 +115,10 @@ export default function Header() {
                 <a
                   key={link.href}
                   href={link.href}
-                  onClick={() => setMobileOpen(false)}
+                  onClick={(e) => {
+                    smoothScrollTo(e, link.href)
+                    setMobileOpen(false)
+                  }}
                   className="px-4 py-3 text-gray-700 font-medium rounded-lg hover:bg-primary-50 hover:text-primary-600 transition-colors"
                 >
                   {link.label}

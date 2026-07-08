@@ -4,11 +4,24 @@ import { motion } from 'framer-motion'
 import { Gift, ArrowDown, Sparkles } from 'lucide-react'
 import { PRODUCTS } from '../utils/constants'
 import { useTilt } from '../utils/useTilt'
+import { smoothScrollTo } from '../utils/smoothScroll'
+import { useProducts } from '../context/ProductsContext'
+import { useCms } from '../context/CmsContext'
 
 export default function Hero() {
-  const { t } = useTranslation()
+  const { t, i18n } = useTranslation()
+  const currentLang = i18n.language || 'fr'
+  const { products, loading, productsList } = useProducts()
+  const { getText, getGallery } = useCms()
   const [stock, setStock] = useState(47)
   const { tiltStyle, handleMouseMove, handleMouseLeave } = useTilt(10, 1.03)
+
+  // Get pack product specifically
+  const packProduct = productsList ? productsList.find(p => p.id === 'pack') : (products?.pack || null)
+  const heroGalleryImages = getGallery('hero')
+  const packImage = heroGalleryImages.length > 0
+    ? heroGalleryImages[0].image_url
+    : ((!loading && packProduct?.image) ? packProduct.image : '/images/books-cover-real.jpg')
 
   useEffect(() => {
     const interval = setInterval(() => {
@@ -16,6 +29,10 @@ export default function Hero() {
     }, 30000)
     return () => clearInterval(interval)
   }, [])
+
+  const badgeText = getText('hero.badge', currentLang) || t('hero.badge')
+  const bonusTitle = getText('hero.bonus', currentLang) || t('hero.bonus')
+  const bonusDesc = getText('hero.bonusDescription', currentLang) || t('hero.bonusDescription')
 
   return (
     <section className="relative min-h-screen flex items-center overflow-hidden bg-gradient-to-br from-primary-800 via-primary-700 to-primary-900">
@@ -35,19 +52,23 @@ export default function Hero() {
               className="inline-flex items-center gap-2 bg-accent-500/20 border border-accent-400/30 text-accent-300 px-4 py-2 rounded-full text-sm font-medium mb-6 w-fit"
             >
               <Gift className="w-4 h-4" />
-              {t('hero.badge')}
+              {badgeText}
             </motion.div>
 
             <h1 className="text-3xl sm:text-4xl lg:text-5xl font-extrabold text-white leading-tight mb-6">
-              {t('hero.title')}
+              {t('hero.title', { price: (!loading && packProduct?.price) ? packProduct.price : PRODUCTS.pack.price })}
             </h1>
 
             <div className="flex items-baseline gap-3 mb-4">
               <span className="text-5xl sm:text-6xl font-black text-accent-400 animate-countdown">
-                {PRODUCTS.pack.price}
+                {(!loading && packProduct?.price) ? packProduct.price : PRODUCTS.pack.price}
               </span>
               <span className="text-2xl text-white/80 font-semibold">DA</span>
-              <span className="text-white/50 line-through text-xl">{PRODUCTS.pack.originalPrice} DA</span>
+              {((!loading && packProduct?.original_price) || PRODUCTS.pack.originalPrice) && (
+                <span className="text-white/50 line-through text-xl">
+                  {(!loading && packProduct?.original_price) ? packProduct.original_price : PRODUCTS.pack.originalPrice} DA
+                </span>
+              )}
             </div>
 
             {/* Pack Image - Mobile Only */}
@@ -59,7 +80,7 @@ export default function Hero() {
             >
               <div className="relative max-w-sm w-full aspect-[4/3] rounded-3xl overflow-hidden bg-white/5 border border-white/10 p-4 backdrop-blur-sm shadow-2xl flex items-center justify-center">
                 <img
-                  src="/images/books-cover-real.jpg"
+                  src={packImage}
                   alt="BiologyBooks Pack"
                   className="max-h-[220px] object-contain drop-shadow-[0_15px_15px_rgba(0,0,0,0.5)] transition-transform duration-500 group-hover:scale-105"
                 />
@@ -72,8 +93,8 @@ export default function Hero() {
               transition={{ duration: 0.5, delay: 0.1 }}
               className="rounded-3xl bg-white/10 border border-white/20 p-6 mb-8"
             >
-              <p className="text-accent-200 font-semibold mb-2">{t('hero.bonus')}</p>
-              <p className="text-white/70">{t('hero.bonusDescription')}</p>
+              <p className="text-accent-200 font-semibold mb-2">{bonusTitle}</p>
+              <p className="text-white/70">{bonusDesc}</p>
             </motion.div>
 
             <p className="text-white/70 text-sm mb-6">{t('hero.orIndividual')}</p>
@@ -90,6 +111,7 @@ export default function Hero() {
 
             <motion.a
               href="#products"
+              onClick={(e) => smoothScrollTo(e, '#products')}
               initial={{ y: 0 }}
               animate={{ y: [0, -8, 0] }}
               transition={{ repeat: Infinity, duration: 2 }}
@@ -116,7 +138,7 @@ export default function Hero() {
                 className="relative w-full aspect-[4/3] rounded-3xl overflow-hidden bg-white/5 border border-white/10 p-6 backdrop-blur-sm shadow-2xl flex items-center justify-center cursor-pointer select-none"
               >
                 <img
-                  src="/images/books-cover-real.jpg"
+                  src={packImage}
                   alt="BiologyBooks Pack"
                   className="max-h-[380px] object-contain drop-shadow-[0_20px_20px_rgba(0,0,0,0.6)]"
                 />

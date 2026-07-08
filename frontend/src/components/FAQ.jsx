@@ -2,11 +2,18 @@ import { useState } from 'react'
 import { useTranslation } from 'react-i18next'
 import { motion, AnimatePresence } from 'framer-motion'
 import { ChevronDown, HelpCircle } from 'lucide-react'
+import { useCms } from '../context/CmsContext'
 
 export default function FAQ() {
-  const { t } = useTranslation()
+  const { t, i18n } = useTranslation()
+  const currentLang = i18n.language || 'fr'
   const [openIndex, setOpenIndex] = useState(null)
-  const items = t('faq.items', { returnObjects: true })
+  const { getFaq, cmsLoading } = useCms()
+
+  // Use CMS FAQ if available, otherwise fallback to i18n
+  const cmsFaq = getFaq(currentLang)
+  const rawItems = cmsFaq.length > 0 ? cmsFaq : t('faq.items', { returnObjects: true })
+  const items = Array.isArray(rawItems) ? rawItems : []
 
   return (
     <section id="faq" className="py-20 bg-gray-50">
@@ -28,7 +35,7 @@ export default function FAQ() {
         <div className="space-y-4">
           {items.map((item, i) => (
             <motion.div
-              key={i}
+              key={item.id || i}
               initial={{ opacity: 0, y: 10 }}
               whileInView={{ opacity: 1, y: 0 }}
               viewport={{ once: true }}

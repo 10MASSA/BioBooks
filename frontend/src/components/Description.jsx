@@ -1,12 +1,37 @@
 import { useTranslation } from 'react-i18next'
 import { motion } from 'framer-motion'
-import { BookOpen, FlaskConical, CheckCircle2 } from 'lucide-react'
+import { BookOpen, FlaskConical, CheckCircle2, GraduationCap, Lightbulb } from 'lucide-react'
 import { PRODUCTS } from '../utils/constants'
+import { smoothScrollTo } from '../utils/smoothScroll'
+import { useProducts } from '../context/ProductsContext'
+import { useCms } from '../context/CmsContext'
 
 export default function Description() {
-  const { t } = useTranslation()
+  const { t, i18n } = useTranslation()
+  const currentLang = i18n.language || 'fr'
+  const { products, loading, productsList } = useProducts()
+  const { getText, getFeatures, cmsLoading } = useCms()
 
-  const books = [
+  const icons = [FlaskConical, BookOpen, GraduationCap, Lightbulb]
+  const gradients = [
+    'from-blue-500 to-blue-700',
+    'from-orange-500 to-orange-600',
+    'from-green-500 to-green-700',
+    'from-purple-500 to-purple-700'
+  ]
+  const iconColors = ['#3b82f6', '#f59e0b', '#10b981', '#8b5cf6']
+
+  // Get all active products from productsList, excluding the pack
+  const activeProducts = productsList ? productsList.filter(p => p.is_active && p.id !== 'pack') : []
+  
+  // Use dynamic products if available, otherwise fall back to hardcoded books
+  const books = activeProducts.length > 0 ? activeProducts.map((p, idx) => ({
+    key: p.id,
+    productId: p.id,
+    icon: icons[idx % icons.length],
+    gradient: gradients[idx % gradients.length],
+    iconColor: iconColors[idx % iconColors.length],
+  })) : [
     {
       key: 'book1',
       productId: 'book1',
@@ -23,6 +48,10 @@ export default function Description() {
     },
   ]
 
+  const sectionTitle = getText('description.title', currentLang) || t('description.title')
+  const sectionSubtitle = getText('description.subtitle', currentLang) || t('description.subtitle')
+  const promoText = getText('description.promo', currentLang) || t('description.promo')
+
   return (
     <section id="description" className="py-20 bg-white">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
@@ -33,10 +62,10 @@ export default function Description() {
           className="text-center mb-16"
         >
           <h2 className="text-3xl sm:text-4xl font-bold text-gray-900 mb-4">
-            {t('description.title')}
+            {sectionTitle}
           </h2>
           <p className="text-gray-600 text-lg max-w-2xl mx-auto mb-6">
-            {t('description.subtitle')}
+            {sectionSubtitle}
           </p>
           <motion.div
             initial={{ opacity: 0, scale: 0.95 }}
@@ -44,15 +73,30 @@ export default function Description() {
             viewport={{ once: true }}
             className="inline-block bg-primary-50 border border-primary-100 rounded-2xl px-6 py-4 max-w-3xl mx-auto text-primary-800 font-semibold shadow-sm text-base leading-relaxed"
           >
-            💡 {t('description.promo')}
+            💡 {promoText}
           </motion.div>
         </motion.div>
 
         <div className="grid md:grid-cols-2 gap-8">
           {books.map((book, idx) => {
             const Icon = book.icon
-            const items = t(`description.${book.key}.items`, { returnObjects: true })
-            const price = PRODUCTS[book.productId].price
+            // Use CMS features if available, otherwise fall back to i18n
+            const cmsFeatures = getFeatures(book.productId, currentLang)
+            const rawItems = cmsFeatures.length > 0 ? cmsFeatures : t(`description.${book.key}.items`, { returnObjects: true })
+            const items = Array.isArray(rawItems) ? rawItems : []
+            const price = (!loading && products[book.productId]?.price) ? products[book.productId].price : (PRODUCTS[book.productId]?.price ?? 0)
+
+            // Title: use DB translated name from products context, or CMS text, or i18n
+            let bookTitle
+            const fallbackTitle = t(`description.${book.key}.title`)
+            if (!loading && products[book.productId]?.name) {
+              const dbProduct = products[book.productId]
+              if (currentLang === 'en') bookTitle = dbProduct.name_en || fallbackTitle
+              else if (currentLang === 'ar') bookTitle = dbProduct.name_ar || fallbackTitle
+              else bookTitle = dbProduct.name || fallbackTitle
+            } else {
+              bookTitle = fallbackTitle
+            }
 
             return (
               <motion.div
@@ -70,7 +114,7 @@ export default function Description() {
                         <Icon className="w-7 h-7 text-white" />
                       </div>
                       <h3 className="text-lg font-bold text-white leading-snug">
-                        {t(`description.${book.key}.title`)}
+                        {bookTitle}
                       </h3>
                     </div>
                     <div className="bg-white/20 backdrop-blur-sm px-4 py-2 rounded-xl text-white font-black text-xl shrink-0">
@@ -98,6 +142,7 @@ export default function Description() {
                 <div className="px-6 pb-6">
                   <a
                     href="#products"
+                    onClick={(e) => smoothScrollTo(e, '#products')}
                     className="block text-center py-3 rounded-xl font-semibold text-white transition-colors"
                     style={{ backgroundColor: book.iconColor }}
                   >
@@ -115,10 +160,23 @@ export default function Description() {
           viewport={{ once: true }}
           className="mt-8 bg-gradient-to-r from-primary-600 to-primary-700 rounded-3xl p-8 text-center text-white shadow-xl"
         >
-          <p className="text-lg font-semibold mb-2">{t('products.pack.name')}</p>
-          <p className="text-4xl font-black mb-4">{PRODUCTS.pack.price} DA</p>
+          <p className="text-lg font-semibold mb-2">
+            {(() => {
+              const p = products?.pack
+              if (!loading && p?.name) {
+                if (currentLang === 'en') return p.name_en || t('products.pack.name')
+                if (currentLang === 'ar') return p.name_ar || t('products.pack.name')
+                return p.name
+              }
+              return t('products.pack.name')
+            })()}
+          </p>
+          <p className="text-4xl font-black mb-4">
+            {(!loading && products?.pack?.price) ? products.pack.price : PRODUCTS.pack.price} DA
+          </p>
           <a
             href="#products"
+            onClick={(e) => smoothScrollTo(e, '#products')}
             className="inline-block bg-accent-500 hover:bg-accent-600 text-white font-bold px-8 py-3 rounded-2xl transition-colors"
           >
             {t('hero.cta')}
@@ -128,3 +186,4 @@ export default function Description() {
     </section>
   )
 }
+
