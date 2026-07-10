@@ -22,6 +22,11 @@ export const PRODUCTS = {
 
 export const getProductPrice = (productId) => PRODUCTS[productId]?.price ?? 0
 
+export const formatPrice = (price) => {
+  if (price === null || price === undefined) return ''
+  return Number(price) % 1 === 0 ? String(Math.round(Number(price))) : String(price)
+}
+
 export const WHATSAPP_NUMBERS = [
   { number: '0674790645', link: 'https://wa.me/213674790645' },
   { number: '0557345457', link: 'https://wa.me/213557345457' },

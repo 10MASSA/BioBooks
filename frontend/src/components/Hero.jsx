@@ -61,12 +61,12 @@ export default function Hero() {
 
             <div className="flex items-baseline gap-3 mb-4">
               <span className="text-5xl sm:text-6xl font-black text-accent-400 animate-countdown">
-                {(!loading && packProduct?.price) ? packProduct.price : PRODUCTS.pack.price}
+                {((!loading && packProduct?.price) ? packProduct.price : PRODUCTS.pack.price).toString().replace(/\.00$/, '')}
               </span>
               <span className="text-2xl text-white/80 font-semibold">DA</span>
               {((!loading && packProduct?.original_price) || PRODUCTS.pack.originalPrice) && (
                 <span className="text-white/50 line-through text-xl">
-                  {(!loading && packProduct?.original_price) ? packProduct.original_price : PRODUCTS.pack.originalPrice} DA
+                  {((!loading && packProduct?.original_price) ? packProduct.original_price : PRODUCTS.pack.originalPrice).toString().replace(/\.00$/, '')} DA
                 </span>
               )}
             </div>

@@ -1,7 +1,7 @@
 import { useTranslation } from 'react-i18next'
 import { motion } from 'framer-motion'
 import { BookOpen, FlaskConical, CheckCircle2, GraduationCap, Lightbulb } from 'lucide-react'
-import { PRODUCTS } from '../utils/constants'
+import { PRODUCTS, formatPrice } from '../utils/constants'
 import { smoothScrollTo } from '../utils/smoothScroll'
 import { useProducts } from '../context/ProductsContext'
 import { useCms } from '../context/CmsContext'
@@ -84,7 +84,7 @@ export default function Description() {
             const cmsFeatures = getFeatures(book.productId, currentLang)
             const rawItems = cmsFeatures.length > 0 ? cmsFeatures : t(`description.${book.key}.items`, { returnObjects: true })
             const items = Array.isArray(rawItems) ? rawItems : []
-            const price = (!loading && products[book.productId]?.price) ? products[book.productId].price : (PRODUCTS[book.productId]?.price ?? 0)
+            const price = formatPrice((!loading && products[book.productId]?.price) ? products[book.productId].price : (PRODUCTS[book.productId]?.price ?? 0))
 
             // Title: use DB translated name from products context, or CMS text, or i18n
             let bookTitle
@@ -172,7 +172,7 @@ export default function Description() {
             })()}
           </p>
           <p className="text-4xl font-black mb-4">
-            {(!loading && products?.pack?.price) ? products.pack.price : PRODUCTS.pack.price} DA
+            {formatPrice((!loading && products?.pack?.price) ? products.pack.price : PRODUCTS.pack.price)} DA
           </p>
           <a
             href="#products"

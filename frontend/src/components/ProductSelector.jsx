@@ -1,7 +1,7 @@
 import { useTranslation } from 'react-i18next'
 import { motion } from 'framer-motion'
 import { Minus, Plus, BookOpen, FlaskConical, Gift, Sparkles } from 'lucide-react'
-import { PRODUCTS } from '../utils/constants'
+import { PRODUCTS, formatPrice } from '../utils/constants'
 import { useProducts } from '../context/ProductsContext'
 
 const ICONS = [FlaskConical, BookOpen, Gift, Sparkles]
@@ -115,10 +115,10 @@ export default function ProductSelector({ productId, setProductId, quantity, set
                   {productDesc}
                 </p>
                 <div className="flex items-baseline gap-2">
-                  <span className="text-2xl font-black text-primary-700">{product.price}</span>
+                  <span className="text-2xl font-black text-primary-700">{formatPrice(product.price)}</span>
                   <span className="text-sm font-semibold text-gray-500">DA</span>
                   {product.originalPrice && (
-                    <span className="text-xs text-gray-400 line-through">{product.originalPrice} DA</span>
+                    <span className="text-xs text-gray-400 line-through">{formatPrice(product.originalPrice)} DA</span>
                   )}
                 </div>
                 {selected && (
@@ -138,7 +138,7 @@ export default function ProductSelector({ productId, setProductId, quantity, set
           className="bg-gradient-to-br from-primary-50 to-white border-2 border-primary-200 rounded-3xl p-6 sm:p-8 shadow-lg"
         >
           <p className="text-center text-sm font-semibold text-gray-600 mb-4">
-            {getTranslatedName(productId, dbProduct)} — {unitPrice} DA
+            {getTranslatedName(productId, dbProduct)} — {formatPrice(unitPrice)} DA
           </p>
 
           <div className="flex items-center justify-center gap-6 mb-6">
@@ -170,7 +170,7 @@ export default function ProductSelector({ productId, setProductId, quantity, set
 
           <div className="text-center pt-4 border-t border-primary-200">
             <span className="text-gray-500">{t('products.subtotal')} : </span>
-            <span className="text-3xl font-black text-primary-700">{total} DA</span>
+            <span className="text-3xl font-black text-primary-700">{formatPrice(total)} DA</span>
           </div>
         </motion.div>
       </div>
