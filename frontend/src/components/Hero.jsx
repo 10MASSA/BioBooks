@@ -2,7 +2,7 @@ import { useState, useEffect } from 'react'
 import { useTranslation } from 'react-i18next'
 import { motion } from 'framer-motion'
 import { Gift, ArrowDown, Sparkles } from 'lucide-react'
-import { PRODUCTS } from '../utils/constants'
+import { PRODUCTS, formatPrice } from '../utils/constants'
 import { useTilt } from '../utils/useTilt'
 import { smoothScrollTo } from '../utils/smoothScroll'
 import { useProducts } from '../context/ProductsContext'
@@ -56,7 +56,7 @@ export default function Hero() {
             </motion.div>
 
             <h1 className="text-3xl sm:text-4xl lg:text-5xl font-extrabold text-white leading-tight mb-6">
-              {t('hero.title', { price: (!loading && packProduct?.price) ? packProduct.price : PRODUCTS.pack.price })}
+              {t('hero.title', { price: formatPrice((!loading && packProduct?.price) ? packProduct.price : PRODUCTS.pack.price) })}
             </h1>
 
             <div className="flex items-baseline gap-3 mb-4">
