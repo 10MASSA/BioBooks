@@ -32,10 +32,10 @@ app.use(cors({
   credentials: true,
 }))
 
-// ✅ Sécurité : limite à 100 requêtes par 15 minutes par IP
+// ✅ Sécurité : limite à 500 requêtes par 15 minutes par IP
 const limiter = rateLimit({
   windowMs: 15 * 60 * 1000,
-  max: 100,
+  max: 500,
   standardHeaders: true,
   legacyHeaders: false,
   message: { error: 'Trop de requêtes, réessayez dans 15 minutes.' },
