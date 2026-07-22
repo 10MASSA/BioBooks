@@ -112,17 +112,21 @@ export default function Admin() {
       const res = await fetch(`${apiBase}/api/admin/login`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ password }),
+        body: JSON.stringify({ password: (password || '').trim() }),
       })
+      if (res.status === 401) {
+        setLoginError(t('admin.invalidPassword') || 'Mot de passe incorrect')
+        return
+      }
       if (!res.ok) {
-        setLoginError(t('admin.invalidPassword'))
+        setLoginError(`Erreur serveur (${res.status}). Réessayez dans un instant.`)
         return
       }
       const { token: newToken } = await res.json()
       localStorage.setItem('admin_token', newToken)
       setToken(newToken)
     } catch {
-      setLoginError(t('admin.invalidPassword'))
+      setLoginError('Impossible de contacter le serveur. Vérifiez la connexion.')
     }
   }
 

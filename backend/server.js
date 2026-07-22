@@ -16,32 +16,25 @@ const PORT = process.env.PORT || 3001
 // ✅ Nécessaire pour Railway (récupère la vraie IP de l'utilisateur derrière le proxy Railway)
 app.set('trust proxy', 1)
 
-// ✅ Sécurité : headers HTTP (protection XSS, clickjacking, etc.)
-app.use(helmet())
+// ✅ Sécurité : headers HTTP tolérants aux ressources croisées
+app.use(helmet({
+  crossOriginResourcePolicy: false,
+  crossOriginEmbedderPolicy: false,
+}))
 
-// ✅ Sécurité : CORS restreint au domaine autorisé
-const allowedOrigins = [
-  'https://bio-books-hzff.vercel.app',
-  'http://localhost:5173', // développement local
-]
+// ✅ Sécurité : CORS ouvert aux domaines Vercel et dev local
 app.use(cors({
-  origin: (origin, callback) => {
-    if (!origin || allowedOrigins.includes(origin)) {
-      callback(null, true)
-    } else {
-      callback(new Error('Not allowed by CORS'))
-    }
-  },
+  origin: true, // Accepte l'origine de la requête (Vercel, localhost, mobile)
   credentials: true,
 }))
 
-// ✅ Sécurité : limite globale (exclut totalement la partie admin pour ne jamais bloquer l'administrateur)
+// ✅ Sécurité : limite globale anti-spam (exclut totalement l'administration)
 const limiter = rateLimit({
   windowMs: 15 * 60 * 1000,
   max: 1000,
   standardHeaders: true,
   legacyHeaders: false,
-  skip: (req) => req.path.startsWith('/admin'), // ne limite jamais l'admin
+  skip: (req) => req.path.includes('/admin'),
   message: { error: 'Trop de requêtes, réessayez dans 15 minutes.' },
 })
 app.use('/api/', limiter)
