@@ -13,6 +13,9 @@ dotenv.config()
 const app = express()
 const PORT = process.env.PORT || 3001
 
+// ✅ Nécessaire pour Railway (récupère la vraie IP de l'utilisateur derrière le proxy Railway)
+app.set('trust proxy', 1)
+
 // ✅ Sécurité : headers HTTP (protection XSS, clickjacking, etc.)
 app.use(helmet())
 
@@ -32,23 +35,16 @@ app.use(cors({
   credentials: true,
 }))
 
-// ✅ Sécurité : limite à 500 requêtes par 15 minutes par IP
+// ✅ Sécurité : limite globale (exclut totalement la partie admin pour ne jamais bloquer l'administrateur)
 const limiter = rateLimit({
   windowMs: 15 * 60 * 1000,
-  max: 500,
+  max: 1000,
   standardHeaders: true,
   legacyHeaders: false,
+  skip: (req) => req.path.startsWith('/admin'), // ne limite jamais l'admin
   message: { error: 'Trop de requêtes, réessayez dans 15 minutes.' },
 })
 app.use('/api/', limiter)
-
-// ✅ Sécurité : limite plus stricte pour les commandes (10 par heure)
-const orderLimiter = rateLimit({
-  windowMs: 60 * 60 * 1000,
-  max: 10,
-  message: { error: 'Trop de commandes, réessayez dans une heure.' },
-})
-app.use('/api/orders', orderLimiter)
 
 app.use(express.json())
 
