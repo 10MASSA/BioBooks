@@ -1,5 +1,11 @@
 export const DELIVERY_FEE = 450
-export const API_URL = import.meta.env.VITE_API_URL || 'https://biobooks-backend.onrender.com'
+export const API_URL = (() => {
+  const envUrl = import.meta.env.VITE_API_URL
+  if (!envUrl || envUrl.includes('railway')) {
+    return 'https://biobooks-backend.onrender.com'
+  }
+  return envUrl
+})()
 
 export const PRODUCTS = {
   book1: {
