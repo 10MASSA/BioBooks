@@ -65,15 +65,21 @@ export default function Admin() {
         setToken('')
         return
       }
+      if (!res.ok) {
+        setOrders((prev) => (Array.isArray(prev) ? prev : []))
+        return
+      }
       const data = await res.json()
+      const validData = Array.isArray(data) ? data : []
       
       setOrders((prevOrders) => {
-        if (prevOrders.length > 0 && data.length > prevOrders.length) {
-          const diff = data.length - prevOrders.length
+        const safePrev = Array.isArray(prevOrders) ? prevOrders : []
+        if (safePrev.length > 0 && validData.length > safePrev.length) {
+          const diff = validData.length - safePrev.length
           playNotificationSound()
           setNewOrderToast(`${diff} nouvelle(s) commande(s) reçue(s) !`)
         }
-        return data
+        return validData
       })
     } catch {
       setOrders([])

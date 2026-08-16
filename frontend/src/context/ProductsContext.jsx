@@ -11,9 +11,10 @@ export function ProductsProvider({ children }) {
   const fetchProducts = async () => {
     try {
       const apiBase = API_URL ? API_URL.replace(/\/+$/, '') : '';
-        const res = await fetch(`${apiBase}/api/products`);
-        if (res.ok) {
-          const data = await res.json();
+      const res = await fetch(`${apiBase}/api/products`);
+      if (res.ok) {
+        const data = await res.json();
+        if (Array.isArray(data)) {
           const productsMap = {};
           data.forEach(p => {
             productsMap[p.id] = {
@@ -28,12 +29,13 @@ export function ProductsProvider({ children }) {
           setProducts(productsMap);
           setProductsList(data);
         }
-      } catch (err) {
-        console.error('Failed to fetch products', err);
-      } finally {
-        setLoading(false);
       }
-    };
+    } catch (err) {
+      console.error('Failed to fetch products', err);
+    } finally {
+      setLoading(false);
+    }
+  };
   useEffect(() => {
     fetchProducts();
   }, []);

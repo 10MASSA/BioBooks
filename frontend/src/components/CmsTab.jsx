@@ -19,10 +19,19 @@ function FaqAdmin({ token }) {
 
   const fetch_ = useCallback(async () => {
     setLoading(true)
-    const res = await fetch(`${apiBase}/api/admin/cms/faq`, { headers })
-    const data = await res.json()
-    setItems(data)
-    setLoading(false)
+    try {
+      const res = await fetch(`${apiBase}/api/admin/cms/faq`, { headers })
+      if (res.ok) {
+        const data = await res.json()
+        setItems(Array.isArray(data) ? data : [])
+      } else {
+        setItems([])
+      }
+    } catch {
+      setItems([])
+    } finally {
+      setLoading(false)
+    }
   }, [token])
 
   useEffect(() => { fetch_() }, [fetch_])
@@ -139,11 +148,12 @@ function FeaturesAdmin({ token }) {
   // Load products dynamically
   useEffect(() => {
     fetch(`${apiBase}/api/products`)
-      .then(r => r.json())
+      .then(r => r.ok ? r.json() : [])
       .then(data => {
-        setProducts(data)
-        if (data.length > 0 && !form.product_id) {
-          setForm(f => ({ ...f, product_id: data[0].id }))
+        const list = Array.isArray(data) ? data : []
+        setProducts(list)
+        if (list.length > 0 && !form.product_id) {
+          setForm(f => ({ ...f, product_id: list[0].id }))
         }
       })
       .catch(() => {})
@@ -151,10 +161,19 @@ function FeaturesAdmin({ token }) {
 
   const fetch_ = useCallback(async () => {
     setLoading(true)
-    const res = await fetch(`${apiBase}/api/admin/cms/features`, { headers })
-    const data = await res.json()
-    setItems(data)
-    setLoading(false)
+    try {
+      const res = await fetch(`${apiBase}/api/admin/cms/features`, { headers })
+      if (res.ok) {
+        const data = await res.json()
+        setItems(Array.isArray(data) ? data : [])
+      } else {
+        setItems([])
+      }
+    } catch {
+      setItems([])
+    } finally {
+      setLoading(false)
+    }
   }, [token])
 
   useEffect(() => { fetch_() }, [fetch_])
@@ -701,12 +720,15 @@ function TextsAdmin({ token }) {
 
   useEffect(() => {
     fetch(`${apiBase}/api/admin/cms/texts`, { headers })
-      .then(r => r.json())
+      .then(r => r.ok ? r.json() : [])
       .then(data => {
-        const map = {}
-        data.forEach(t => { map[t.key_name] = t.fr_value })
-        setValues(map)
+        if (Array.isArray(data)) {
+          const map = {}
+          data.forEach(t => { map[t.key_name] = t.fr_value })
+          setValues(map)
+        }
       })
+      .catch(() => {})
   }, [token])
 
   const saveKey = async (key) => {

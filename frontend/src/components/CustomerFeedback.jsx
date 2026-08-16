@@ -30,19 +30,21 @@ export default function CustomerFeedback() {
   const { getTestimonials, cms } = useCms()
 
   // Use DB testimonials if available, otherwise fallback
-  const dbTestimonials = getTestimonials(currentLang)
+  const dbTestimonials = Array.isArray(getTestimonials(currentLang)) ? getTestimonials(currentLang) : []
   const useDbData = dbTestimonials.length > 0
 
   // Convert DB testimonials to the same format as FEEDBACKS_DEFAULT
-  const FEEDBACKS = useDbData
+  const FEEDBACKS = (useDbData
     ? dbTestimonials.map((t, index) => ({
         src: getFeedbackImage(t, index),
-        user: t.name,
-        snippet: t.text,
-        rating: t.rating,
+        user: t?.name || 'Acheteur',
+        snippet: t?.text || '',
+        rating: t?.rating || 5,
         isText: true,
       }))
-    : FEEDBACKS_DEFAULT
+    : FEEDBACKS_DEFAULT) || FEEDBACKS_DEFAULT
+
+  const safeFeedbacks = FEEDBACKS.length > 0 ? FEEDBACKS : FEEDBACKS_DEFAULT
 
   const [currentIndex, setCurrentIndex] = useState(0)
   const [zoomIndex, setZoomIndex] = useState(null)
@@ -50,30 +52,35 @@ export default function CustomerFeedback() {
 
   // Auto-play toutes les 8 secondes
   useEffect(() => {
+    if (safeFeedbacks.length <= 1) return
     const timer = setInterval(() => {
       handleNext()
     }, 8000)
     return () => clearInterval(timer)
-  }, [currentIndex])
+  }, [currentIndex, safeFeedbacks.length])
 
   const handleNext = () => {
+    if (safeFeedbacks.length === 0) return
     setDirection(1)
-    setCurrentIndex((prev) => (prev + 1) % FEEDBACKS.length)
+    setCurrentIndex((prev) => (prev + 1) % safeFeedbacks.length)
   }
 
   const handlePrev = () => {
+    if (safeFeedbacks.length === 0) return
     setDirection(-1)
-    setCurrentIndex((prev) => (prev - 1 + FEEDBACKS.length) % FEEDBACKS.length)
+    setCurrentIndex((prev) => (prev - 1 + safeFeedbacks.length) % safeFeedbacks.length)
   }
 
   const handleZoomNext = (e) => {
     e.stopPropagation()
-    setZoomIndex((prev) => (prev + 1) % FEEDBACKS.length)
+    if (safeFeedbacks.length === 0) return
+    setZoomIndex((prev) => (prev === null ? 0 : (prev + 1) % safeFeedbacks.length))
   }
 
   const handleZoomPrev = (e) => {
     e.stopPropagation()
-    setZoomIndex((prev) => (prev - 1 + FEEDBACKS.length) % FEEDBACKS.length)
+    if (safeFeedbacks.length === 0) return
+    setZoomIndex((prev) => (prev === null ? 0 : (prev - 1 + safeFeedbacks.length) % safeFeedbacks.length))
   }
 
   const slideVariants = {
@@ -91,7 +98,7 @@ export default function CustomerFeedback() {
     }),
   }
 
-  const activeFeedback = FEEDBACKS[currentIndex]
+  const activeFeedback = safeFeedbacks[currentIndex % safeFeedbacks.length] || safeFeedbacks[0]
 
   return (
     <section id="feedback" className="py-20 bg-gray-50 border-t border-gray-100 overflow-hidden">

@@ -18,9 +18,11 @@ export default function ProductsTab({ token }) {
       const res = await fetch(`${apiBase}/api/admin/products`, {
         headers: { Authorization: `Bearer ${token}` }
       })
-      if(res.ok) {
+      if (res.ok) {
         const data = await res.json()
-        setProducts(data)
+        setProducts(Array.isArray(data) ? data : [])
+      } else {
+        setProducts([])
       }
     } catch (err) {
       console.error(err)

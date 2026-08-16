@@ -20,16 +20,34 @@ export function CmsProvider({ children }) {
         const testimonials = Array.isArray(data?.testimonials) && data.testimonials.length > 0
           ? data.testimonials
           : getStoredTestimonials()
-        const merged = { ...data, gallery, testimonials }
+        const merged = {
+          texts: Array.isArray(data?.texts) ? data.texts : [],
+          faq: Array.isArray(data?.faq) ? data.faq : [],
+          features: Array.isArray(data?.features) ? data.features : [],
+          gallery: Array.isArray(gallery) ? gallery : [],
+          testimonials: Array.isArray(testimonials) ? testimonials : []
+        }
         setCms(merged)
         saveGalleryItems(gallery)
         saveTestimonials(testimonials)
       } else {
-        setCms(prev => ({ ...prev, gallery: getStoredGalleryItems(), testimonials: getStoredTestimonials() }))
+        setCms(prev => ({
+          texts: Array.isArray(prev?.texts) ? prev.texts : [],
+          faq: Array.isArray(prev?.faq) ? prev.faq : [],
+          features: Array.isArray(prev?.features) ? prev.features : [],
+          gallery: getStoredGalleryItems(),
+          testimonials: getStoredTestimonials()
+        }))
       }
     } catch (err) {
       console.error('CMS fetch error:', err)
-      setCms(prev => ({ ...prev, gallery: getStoredGalleryItems(), testimonials: getStoredTestimonials() }))
+      setCms(prev => ({
+        texts: Array.isArray(prev?.texts) ? prev.texts : [],
+        faq: Array.isArray(prev?.faq) ? prev.faq : [],
+        features: Array.isArray(prev?.features) ? prev.features : [],
+        gallery: getStoredGalleryItems(),
+        testimonials: getStoredTestimonials()
+      }))
     } finally {
       setCmsLoading(false)
     }
@@ -41,7 +59,8 @@ export function CmsProvider({ children }) {
 
   // Helper: get a text value by key and language
   const getText = (key, lang = 'fr') => {
-    const entry = cms.texts.find(t => t.key_name === key)
+    const textsList = Array.isArray(cms?.texts) ? cms.texts : []
+    const entry = textsList.find(t => t.key_name === key)
     if (!entry) return null
     if (lang === 'en') return entry.en_value || entry.fr_value
     if (lang === 'ar') return entry.ar_value || entry.fr_value
@@ -50,7 +69,8 @@ export function CmsProvider({ children }) {
 
   // Helper: get features for a product in a given language
   const getFeatures = (productId, lang = 'fr') => {
-    return cms.features
+    const featuresList = Array.isArray(cms?.features) ? cms.features : []
+    return featuresList
       .filter(f => f.product_id === productId)
       .map(f => {
         if (lang === 'en') return f.text_en || f.text_fr
@@ -61,12 +81,14 @@ export function CmsProvider({ children }) {
 
   // Helper: get gallery images for an album
   const getGallery = (albumId) => {
-    return cms.gallery.filter(img => img.album_id === albumId)
+    const galleryList = Array.isArray(cms?.gallery) ? cms.gallery : []
+    return galleryList.filter(img => img.album_id === albumId)
   }
 
   // Helper: get FAQ in a given language
   const getFaq = (lang = 'fr') => {
-    return cms.faq.map(item => ({
+    const faqList = Array.isArray(cms?.faq) ? cms.faq : []
+    return faqList.map(item => ({
       id: item.id,
       q: lang === 'en' ? (item.question_en || item.question_fr) : lang === 'ar' ? (item.question_ar || item.question_fr) : item.question_fr,
       a: lang === 'en' ? (item.answer_en || item.answer_fr) : lang === 'ar' ? (item.answer_ar || item.answer_fr) : item.answer_fr,
@@ -75,7 +97,8 @@ export function CmsProvider({ children }) {
 
   // Helper: get testimonials in a given language
   const getTestimonials = (lang = 'fr') => {
-    return cms.testimonials.map(item => ({
+    const testimonialsList = Array.isArray(cms?.testimonials) ? cms.testimonials : []
+    return testimonialsList.map(item => ({
       id: item.id,
       name: item.name,
       text: lang === 'en' ? (item.text_en || item.text_fr) : lang === 'ar' ? (item.text_ar || item.text_fr) : item.text_fr,
