@@ -1,24 +1,36 @@
 import { Routes, Route } from 'react-router-dom'
 import Header from './components/Header'
 import Hero from './components/Hero'
+import BookShowcase from './components/BookShowcase'
 import Description from './components/Description'
+import TargetAudience from './components/TargetAudience'
+import Advantages from './components/Advantages'
+import CustomerFeedback from './components/CustomerFeedback'
+import OrderForm from './components/OrderForm'
+import Contact from './components/Contact'
+import FAQ from './components/FAQ'
 import Footer from './components/Footer'
 import WhatsAppButton from './components/WhatsAppButton'
 import Admin from './pages/Admin'
 
 function LandingPage() {
   return (
-    <div className="min-h-screen flex flex-col bg-slate-50 text-slate-800 antialiased selection:bg-primary-500 selection:text-white">
+    <>
       <Header />
-      <main className="flex-grow">
-        {/* Main Hero with Interactive Media Gallery & Animated Order Form */}
+      <main>
         <Hero />
-        {/* Modern Book Content Description */}
+        <BookShowcase />
         <Description />
+        <TargetAudience />
+        <Advantages />
+        <CustomerFeedback />
+        <OrderForm />
+        <Contact />
+        <FAQ />
       </main>
       <Footer />
       <WhatsAppButton />
-    </div>
+    </>
   )
 }
 
