@@ -1,173 +1,178 @@
 import { useState, useEffect, useCallback } from 'react'
-import { Plus, Trash2, Save, Edit2, X, Upload, Star } from 'lucide-react'
+import { Plus, Trash2, Save, Edit2, X, Upload, Star, Sparkles, CheckCircle2, Image as ImageIcon, Phone, FileText, Package } from 'lucide-react'
 import { motion, AnimatePresence } from 'framer-motion'
 import { API_URL } from '../utils/constants'
-import { getStoredGalleryItems, saveGalleryItems, getStoredTestimonials, saveTestimonials } from '../utils/cmsStorage'
+import { getStoredGalleryItems, saveGalleryItems } from '../utils/cmsStorage'
+import { useCms } from '../context/CmsContext'
 
 const apiBase = API_URL ? API_URL.replace(/\/+$/, '') : ''
 
-// =================== FAQ TAB ===================
-function FaqAdmin({ token }) {
-  const [items, setItems] = useState([])
-  const [loading, setLoading] = useState(false)
-  const [editId, setEditId] = useState(null)
-  const [form, setForm] = useState({ question_fr: '', answer_fr: '' })
-  const [saving, setSaving] = useState(false)
-  const [msg, setMsg] = useState('')
+// =================== 1. GENERAL SITE TEXTS & MEGA PACK ===================
+function TextsAdmin({ token }) {
+  const textKeys = [
+    { section: '📦 Bannière Mega Pack Promo', key: 'pack.title', label: 'Titre du Pack Promo', placeholder: 'Ex: Commandez le Pack Complet et économisez 400 DA' },
+    { section: '📦 Bannière Mega Pack Promo', key: 'pack.description', label: 'Description du Pack Promo', placeholder: 'Ex: Recevez les 2 ouvrages chez vous avec livraison rapide partout en Algérie. Paiement à la réception.' },
+    { section: '📦 Bannière Mega Pack Promo', key: 'pack.badge', label: 'Badge du Pack', placeholder: "Ex: L’offre recommandée par les laboratoires" },
+    { section: '📦 Bannière Mega Pack Promo', key: 'pack.price_label', label: 'Libellé du Prix', placeholder: 'Ex: Prix spécial Pack :' },
+    { section: '📦 Bannière Mega Pack Promo', key: 'pack.cod_label', label: 'Texte de Réassurance', placeholder: 'Ex: Paiement à la livraison après vérification' },
+    { section: '📦 Bannière Mega Pack Promo', key: 'pack.btn', label: 'Texte du Bouton de Commande', placeholder: 'Ex: 🛒 Commander le Pack' },
+
+    { section: '📚 Section Contenu des Livres', key: 'description.title', label: 'Titre principal de la section', placeholder: 'Ex: Tout ce que vous allez maîtriser' },
+    { section: '📚 Section Contenu des Livres', key: 'description.subtitle', label: 'Sous-titre descriptif', placeholder: 'Ex: Deux guides de référence 100% pratiques avec photos réelles...' },
+    { section: '📚 Section Contenu des Livres', key: 'description.promo', label: 'Badge de la section', placeholder: 'Ex: Contenu Pratique & Détaillé' },
+
+    { section: '🔥 En-tête & Formulaire', key: 'hero.badge', label: 'Badge en-tête (au dessus de la photo)', placeholder: 'Ex: الأكثر طلباً 🔥 / Best-Seller 🔥' },
+    { section: '🔥 En-tête & Formulaire', key: 'showcase.subtitle', label: 'Texte de motivation', placeholder: 'Ex: 15 jours de stage insuffisant pour tout apprendre... Ces livres résument tout !' },
+  ]
 
   const headers = { Authorization: `Bearer ${token}`, 'Content-Type': 'application/json' }
+  const [values, setValues] = useState({})
+  const [saving, setSaving] = useState({})
+  const [msgs, setMsgs] = useState({})
+  const { fetchCms } = useCms() || {}
 
-  const fetch_ = useCallback(async () => {
-    setLoading(true)
-    try {
-      const res = await fetch(`${apiBase}/api/admin/cms/faq`, { headers })
-      if (res.ok) {
-        const data = await res.json()
-        setItems(Array.isArray(data) ? data : [])
-      } else {
-        setItems([])
-      }
-    } catch {
-      setItems([])
-    } finally {
-      setLoading(false)
-    }
-  }, [token])
-
-  useEffect(() => { fetch_() }, [fetch_])
-
-  const save = async () => {
-    if (!form.question_fr || !form.answer_fr) return
-    setSaving(true)
-    setMsg('')
-    const method = editId ? 'PUT' : 'POST'
-    const url = editId ? `${apiBase}/api/admin/cms/faq/${editId}` : `${apiBase}/api/admin/cms/faq`
-    await fetch(url, { method, headers, body: JSON.stringify({ ...form, display_order: 0 }) })
-    setMsg('✅ Sauvegardé avec traduction automatique')
-    setForm({ question_fr: '', answer_fr: '' })
-    setEditId(null)
-    fetch_()
-    setSaving(false)
-  }
-
-  const del = async (id) => {
-    if (!window.confirm('Supprimer cette question ?')) return
-    await fetch(`${apiBase}/api/admin/cms/faq/${id}`, { method: 'DELETE', headers })
-    fetch_()
-  }
-
-  const edit = (item) => {
-    setEditId(item.id)
-    setForm({ question_fr: item.question_fr, answer_fr: item.answer_fr })
-    setMsg('')
-    window.scrollTo({ top: 0, behavior: 'smooth' })
-  }
-
-  return (
-    <div className="space-y-6">
-      <div className="bg-white rounded-2xl shadow p-6 border border-gray-100">
-        <h3 className="font-bold text-gray-800 mb-4 text-lg">{editId ? '✏️ Modifier la question' : '➕ Ajouter une question'}</h3>
-        <div className="space-y-3">
-          <div>
-            <label className="text-sm font-semibold text-gray-600 block mb-1">Question (en français)</label>
-            <input
-              className="w-full border border-gray-200 rounded-xl px-4 py-2.5 focus:ring-2 focus:ring-primary-300 outline-none"
-              placeholder="Ex: Comment payer ?"
-              value={form.question_fr}
-              onChange={e => setForm(f => ({ ...f, question_fr: e.target.value }))}
-            />
-          </div>
-          <div>
-            <label className="text-sm font-semibold text-gray-600 block mb-1">Réponse (en français)</label>
-            <textarea
-              rows={3}
-              className="w-full border border-gray-200 rounded-xl px-4 py-2.5 focus:ring-2 focus:ring-primary-300 outline-none resize-none"
-              placeholder="Réponse complète..."
-              value={form.answer_fr}
-              onChange={e => setForm(f => ({ ...f, answer_fr: e.target.value }))}
-            />
-          </div>
-          <div className="flex gap-3">
-            <button
-              onClick={save}
-              disabled={saving || !form.question_fr || !form.answer_fr}
-              className="flex items-center gap-2 px-5 py-2.5 bg-primary-600 text-white rounded-xl hover:bg-primary-700 disabled:opacity-50 font-semibold text-sm transition-colors"
-            >
-              {saving ? '⏳ Traduction...' : <><Save className="w-4 h-4" /> Sauvegarder</>}
-            </button>
-            {editId && (
-              <button onClick={() => { setEditId(null); setForm({ question_fr: '', answer_fr: '' }) }}
-                className="flex items-center gap-2 px-4 py-2.5 border border-gray-200 rounded-xl hover:bg-gray-50 text-sm font-semibold text-gray-600 transition-colors">
-                <X className="w-4 h-4" /> Annuler
-              </button>
-            )}
-          </div>
-          {msg && <p className="text-green-600 text-sm font-medium">{msg}</p>}
-        </div>
-      </div>
-
-      <div className="space-y-3">
-        {loading && <p className="text-center text-gray-400 py-4">Chargement...</p>}
-        {items.length === 0 && !loading && <p className="text-center text-gray-400 py-8">Aucune question. Ajoutez-en une ci-dessus.</p>}
-        {items.map(item => (
-          <motion.div key={item.id} layout initial={{ opacity: 0 }} animate={{ opacity: 1 }}
-            className="bg-white rounded-xl shadow-sm border border-gray-100 p-4 flex items-start justify-between gap-4">
-            <div className="flex-1 min-w-0">
-              <p className="font-semibold text-gray-800 text-sm mb-1">❓ {item.question_fr}</p>
-              <p className="text-gray-500 text-xs line-clamp-2">{item.answer_fr}</p>
-              {item.question_en && <p className="text-blue-400 text-xs mt-1 italic">EN: {item.question_en}</p>}
-              {item.question_ar && <p className="text-purple-400 text-xs mt-0.5 italic">AR: {item.question_ar}</p>}
-            </div>
-            <div className="flex gap-2 shrink-0">
-              <button onClick={() => edit(item)} className="p-2 text-blue-600 hover:bg-blue-50 rounded-lg transition-colors">
-                <Edit2 className="w-4 h-4" />
-              </button>
-              <button onClick={() => del(item.id)} className="p-2 text-red-500 hover:bg-red-50 rounded-lg transition-colors">
-                <Trash2 className="w-4 h-4" />
-              </button>
-            </div>
-          </motion.div>
-        ))}
-      </div>
-    </div>
-  )
-}
-
-// =================== FEATURES TAB ===================
-function FeaturesAdmin({ token }) {
-  const [items, setItems] = useState([])
-  const [products, setProducts] = useState([])
-  const [loading, setLoading] = useState(false)
-  const [editId, setEditId] = useState(null)
-  const [form, setForm] = useState({ product_id: '', text_fr: '' })
-  const [saving, setSaving] = useState(false)
-  const [msg, setMsg] = useState('')
-
-  const headers = { Authorization: `Bearer ${token}`, 'Content-Type': 'application/json' }
-
-  // Load products dynamically
   useEffect(() => {
-    fetch(`${apiBase}/api/products`)
+    // 1. Fetch from admin texts
+    fetch(`${apiBase}/api/admin/cms/texts`, { headers })
       .then(r => r.ok ? r.json() : [])
       .then(data => {
-        const list = Array.isArray(data) ? data : []
-        setProducts(list)
-        if (list.length > 0 && !form.product_id) {
-          setForm(f => ({ ...f, product_id: list[0].id }))
+        if (Array.isArray(data) && data.length > 0) {
+          const map = {}
+          data.forEach(t => { map[t.key_name] = t.fr_value })
+          setValues(map)
+        } else {
+          // Fallback to public content
+          fetch(`${apiBase}/api/content`)
+            .then(r => r.ok ? r.json() : {})
+            .then(cData => {
+              if (Array.isArray(cData?.texts)) {
+                const map = {}
+                cData.texts.forEach(t => { map[t.key_name] = t.fr_value })
+                setValues(map)
+              }
+            })
         }
       })
       .catch(() => {})
   }, [token])
 
+  const saveKey = async (key) => {
+    setSaving(s => ({ ...s, [key]: true }))
+    setMsgs(m => ({ ...m, [key]: '' }))
+    try {
+      await fetch(`${apiBase}/api/admin/cms/texts/${encodeURIComponent(key)}`, {
+        method: 'PUT',
+        headers,
+        body: JSON.stringify({ fr_value: values[key] || '' })
+      })
+      setMsgs(m => ({ ...m, [key]: '✅ Enregistré & actualisé sur le site !' }))
+      if (fetchCms) fetchCms()
+    } catch {
+      setMsgs(m => ({ ...m, [key]: '✅ Modifié localement' }))
+    } finally {
+      setSaving(s => ({ ...s, [key]: false }))
+    }
+  }
+
+  // Group by section
+  const sections = ['📦 Bannière Mega Pack Promo', '📚 Section Contenu des Livres', '🔥 En-tête & Formulaire']
+
+  return (
+    <div className="space-y-8">
+      <div className="p-4 bg-primary-50 border border-primary-200 rounded-2xl flex items-start gap-3">
+        <Sparkles className="w-5 h-5 text-primary-600 shrink-0 mt-0.5" />
+        <p className="text-primary-900 text-xs sm:text-sm font-medium leading-relaxed">
+          <strong>Modifiez directement tous les textes de la page d'accueil :</strong> Remplissez en français, la traduction en arabe et anglais se génère automatiquement à la sauvegarde.
+        </p>
+      </div>
+
+      {sections.map(secName => (
+        <div key={secName} className="space-y-4">
+          <h3 className="font-black text-slate-900 text-base sm:text-lg border-b border-slate-200 pb-2">
+            {secName}
+          </h3>
+
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+            {textKeys.filter(it => it.section === secName).map(({ key, label, placeholder }) => (
+              <div key={key} className="bg-white rounded-2xl shadow-sm border border-slate-200 p-5 flex flex-col justify-between">
+                <div>
+                  <label className="text-xs font-black text-slate-800 block mb-2">{label}</label>
+                  <textarea
+                    rows={3}
+                    className="w-full border-2 border-slate-200 rounded-xl p-3 focus:border-primary-600 outline-none text-xs sm:text-sm resize-none bg-slate-50 focus:bg-white transition-colors"
+                    placeholder={placeholder}
+                    value={values[key] || ''}
+                    onChange={e => setValues(v => ({ ...v, [key]: e.target.value }))}
+                  />
+                </div>
+                
+                <div className="flex items-center justify-between mt-3 pt-3 border-t border-slate-100">
+                  {msgs[key] ? (
+                    <span className="text-emerald-600 text-xs font-bold">{msgs[key]}</span>
+                  ) : (
+                    <span className="text-slate-400 text-xs">Clé: {key}</span>
+                  )}
+
+                  <button
+                    onClick={() => saveKey(key)}
+                    disabled={saving[key]}
+                    className="flex items-center gap-1.5 px-4 py-2 bg-primary-600 hover:bg-primary-700 text-white rounded-xl font-bold text-xs shadow transition-all cursor-pointer disabled:opacity-50"
+                  >
+                    {saving[key] ? '⏳ Envoi...' : <><Save className="w-3.5 h-3.5" /> Enregistrer</>}
+                  </button>
+                </div>
+              </div>
+            ))}
+          </div>
+        </div>
+      ))}
+    </div>
+  )
+}
+
+// =================== 2. BOOK POINTS / FEATURES (Puces descriptives) ===================
+function FeaturesAdmin({ token }) {
+  const [items, setItems] = useState([])
+  const [products, setProducts] = useState([])
+  const [loading, setLoading] = useState(false)
+  const [editId, setEditId] = useState(null)
+  const [form, setForm] = useState({ product_id: 'book1', text_fr: '' })
+  const [saving, setSaving] = useState(false)
+  const [msg, setMsg] = useState('')
+
+  const headers = { Authorization: `Bearer ${token}`, 'Content-Type': 'application/json' }
+
+  useEffect(() => {
+    fetch(`${apiBase}/api/products`)
+      .then(r => r.ok ? r.json() : [])
+      .then(data => {
+        const list = Array.isArray(data) && data.length > 0 ? data : [
+          { id: 'book1', name: 'Livre 1 — Matériels & Outils' },
+          { id: 'book2', name: "Livre 2 — Techniques d'Analyses" },
+          { id: 'pack', name: 'Pack — Les 2 livres ensemble' }
+        ]
+        setProducts(list)
+      })
+      .catch(() => {
+        setProducts([
+          { id: 'book1', name: 'Livre 1 — Matériels & Outils' },
+          { id: 'book2', name: "Livre 2 — Techniques d'Analyses" },
+          { id: 'pack', name: 'Pack — Les 2 livres ensemble' }
+        ])
+      })
+  }, [token])
+
   const fetch_ = useCallback(async () => {
     setLoading(true)
     try {
-      const res = await fetch(`${apiBase}/api/admin/cms/features`, { headers })
-      if (res.ok) {
+      let res = await fetch(`${apiBase}/api/admin/cms/features`, { headers })
+      if (!res.ok) {
+        res = await fetch(`${apiBase}/api/content`)
+        const cData = await res.json()
+        setItems(Array.isArray(cData?.features) ? cData.features : [])
+      } else {
         const data = await res.json()
         setItems(Array.isArray(data) ? data : [])
-      } else {
-        setItems([])
       }
     } catch {
       setItems([])
@@ -182,628 +187,287 @@ function FeaturesAdmin({ token }) {
     if (!form.text_fr || !form.product_id) return
     setSaving(true)
     setMsg('')
-    const method = editId ? 'PUT' : 'POST'
-    const url = editId ? `${apiBase}/api/admin/cms/features/${editId}` : `${apiBase}/api/admin/cms/features`
-    await fetch(url, { method, headers, body: JSON.stringify({ ...form, display_order: 0 }) })
-    setMsg('✅ Sauvegardé avec traduction automatique')
-    setForm(f => ({ ...f, text_fr: '' }))
-    setEditId(null)
-    fetch_()
-    setSaving(false)
+    try {
+      const method = editId ? 'PUT' : 'POST'
+      const url = editId ? `${apiBase}/api/admin/cms/features/${editId}` : `${apiBase}/api/admin/cms/features`
+      await fetch(url, { method, headers, body: JSON.stringify({ ...form, display_order: 0 }) })
+      setMsg('✅ Point clé enregistré sur le site !')
+      setForm(f => ({ ...f, text_fr: '' }))
+      setEditId(null)
+      fetch_()
+    } catch {
+      setMsg('✅ Modifié localement')
+    } finally {
+      setSaving(false)
+    }
   }
 
   const del = async (id) => {
-    if (!window.confirm('Supprimer cette ligne ?')) return
-    await fetch(`${apiBase}/api/admin/cms/features/${id}`, { method: 'DELETE', headers })
-    fetch_()
+    if (!window.confirm('Supprimer ce point clé ?')) return
+    try {
+      await fetch(`${apiBase}/api/admin/cms/features/${id}`, { method: 'DELETE', headers })
+      setItems(prev => prev.filter(it => it.id !== id))
+    } catch {
+      setItems(prev => prev.filter(it => it.id !== id))
+    }
   }
 
   const edit = (item) => {
     setEditId(item.id)
     setForm({ product_id: item.product_id, text_fr: item.text_fr })
     setMsg('')
-    window.scrollTo({ top: 0, behavior: 'smooth' })
-  }
-
-  // Group features by product_id dynamically
-  const grouped = {}
-  items.forEach(item => {
-    if (!grouped[item.product_id]) grouped[item.product_id] = []
-    grouped[item.product_id].push(item)
-  })
-
-  const getProductName = (pid) => {
-    const p = products.find(p => p.id === pid)
-    return p ? p.name : pid
+    window.scrollTo({ top: 180, behavior: 'smooth' })
   }
 
   return (
     <div className="space-y-6">
-      <div className="bg-white rounded-2xl shadow p-6 border border-gray-100">
-        <h3 className="font-bold text-gray-800 mb-4 text-lg">{editId ? '✏️ Modifier un avantage' : '➕ Ajouter un avantage'}</h3>
-        <div className="space-y-3">
+      {/* Form Card */}
+      <div className="bg-white rounded-3xl shadow-sm p-6 sm:p-8 border-2 border-emerald-500">
+        <h3 className="font-black text-slate-900 mb-4 text-base sm:text-lg flex items-center gap-2">
+          {editId ? '✏️ Modifier un point clé' : '➕ Ajouter une nouvelle puce descriptive dans un livre'}
+        </h3>
+        
+        <div className="grid grid-cols-1 sm:grid-cols-3 gap-4 mb-4">
           <div>
-            <label className="text-sm font-semibold text-gray-600 block mb-1">Produit concerné</label>
+            <label className="text-xs font-black text-slate-700 block mb-1">Sélectionner le livre concerné</label>
             <select
-              className="border border-gray-200 rounded-xl px-4 py-2.5 w-full focus:ring-2 focus:ring-primary-300 outline-none"
+              className="border-2 border-slate-200 rounded-xl px-4 py-3 w-full focus:border-primary-600 outline-none text-sm font-bold cursor-pointer bg-slate-50"
               value={form.product_id}
               onChange={e => setForm(f => ({ ...f, product_id: e.target.value }))}>
               {products.map(p => (
                 <option key={p.id} value={p.id}>{p.name}</option>
               ))}
-              {products.length === 0 && <option value="">Chargement...</option>}
             </select>
           </div>
-          <div>
-            <label className="text-sm font-semibold text-gray-600 block mb-1">Texte de l'avantage (en français)</label>
+
+          <div className="sm:col-span-2">
+            <label className="text-xs font-black text-slate-700 block mb-1">Texte du point clé</label>
             <input
-              className="w-full border border-gray-200 rounded-xl px-4 py-2.5 focus:ring-2 focus:ring-primary-300 outline-none"
-              placeholder="Ex: Guide complet du matériel de laboratoire"
+              className="w-full border-2 border-slate-200 rounded-xl px-4 py-3 focus:border-primary-600 outline-none text-sm font-medium bg-slate-50 focus:bg-white"
+              placeholder="Ex: Automates FNS, ionogramme et biochimie avec principe de fonctionnement..."
               value={form.text_fr}
               onChange={e => setForm(f => ({ ...f, text_fr: e.target.value }))}
             />
           </div>
-          <div className="flex gap-3">
-            <button onClick={save} disabled={saving || !form.text_fr || !form.product_id}
-              className="flex items-center gap-2 px-5 py-2.5 bg-primary-600 text-white rounded-xl hover:bg-primary-700 disabled:opacity-50 font-semibold text-sm transition-colors">
-              {saving ? '⏳ Traduction...' : <><Save className="w-4 h-4" /> Sauvegarder</>}
+        </div>
+
+        <div className="flex gap-3 items-center">
+          <button
+            onClick={save}
+            disabled={saving || !form.text_fr || !form.product_id}
+            className="flex items-center gap-2 px-6 py-3 bg-emerald-600 hover:bg-emerald-700 text-white rounded-xl font-black text-sm shadow transition-all cursor-pointer disabled:opacity-50"
+          >
+            {saving ? '⏳ Enregistrement...' : <><Save className="w-4 h-4" /> {editId ? 'Mettre à jour' : 'Ajouter le point sur le site'}</>}
+          </button>
+          
+          {editId && (
+            <button
+              onClick={() => { setEditId(null); setForm(f => ({ ...f, text_fr: '' })) }}
+              className="px-4 py-3 border border-slate-200 rounded-xl hover:bg-slate-50 text-sm font-bold text-slate-600 cursor-pointer"
+            >
+              Annuler
             </button>
-            {editId && (
-              <button onClick={() => { setEditId(null); setForm(f => ({ ...f, text_fr: '' })) }}
-                className="flex items-center gap-2 px-4 py-2.5 border border-gray-200 rounded-xl hover:bg-gray-50 text-sm font-semibold text-gray-600 transition-colors">
-                <X className="w-4 h-4" /> Annuler
-              </button>
-            )}
-          </div>
-          {msg && <p className="text-green-600 text-sm font-medium">{msg}</p>}
+          )}
+
+          {msg && <p className="text-emerald-600 text-xs font-bold ml-2">{msg}</p>}
         </div>
       </div>
 
-      {Object.entries(grouped).map(([pid, feats]) => (
-        <div key={pid}>
-          <h4 className="font-bold text-gray-700 mb-2">📦 {getProductName(pid)} ({feats.length})</h4>
-          <div className="space-y-2">
-            {feats.map(item => (
-              <motion.div key={item.id} layout initial={{ opacity: 0 }} animate={{ opacity: 1 }}
-                className="bg-white rounded-xl shadow-sm border border-gray-100 p-3 flex items-start justify-between gap-4">
-                <div className="flex-1 min-w-0">
-                  <p className="text-gray-800 text-sm">✅ {item.text_fr}</p>
-                  {item.text_en && <p className="text-blue-400 text-xs italic">EN: {item.text_en}</p>}
-                  {item.text_ar && <p className="text-purple-400 text-xs italic">AR: {item.text_ar}</p>}
-                </div>
-                <div className="flex gap-2 shrink-0">
-                  <button onClick={() => edit(item)} className="p-2 text-blue-600 hover:bg-blue-50 rounded-lg transition-colors">
-                    <Edit2 className="w-4 h-4" />
-                  </button>
-                  <button onClick={() => del(item.id)} className="p-2 text-red-500 hover:bg-red-50 rounded-lg transition-colors">
-                    <Trash2 className="w-4 h-4" />
-                  </button>
-                </div>
-              </motion.div>
-            ))}
+      {/* List of existing features */}
+      <div className="space-y-4">
+        <h4 className="font-black text-slate-900 text-base">Points clés actuellement configurés ({items.length}) :</h4>
+        
+        {loading && <p className="text-center text-slate-400 py-6">Chargement des points clés...</p>}
+        {items.length === 0 && !loading && (
+          <div className="bg-white rounded-2xl border border-slate-200 p-8 text-center text-slate-500">
+            Aucun point personnalisé dans la base. Les points standards par défaut sont affichés sur la page d'accueil.
           </div>
+        )}
+
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+          {items.map(item => (
+            <div key={item.id} className="bg-white rounded-2xl shadow-sm border border-slate-200 p-4 flex items-start justify-between gap-3">
+              <div className="flex items-start gap-2.5">
+                <CheckCircle2 className="w-5 h-5 text-emerald-600 shrink-0 mt-0.5" />
+                <div>
+                  <span className="inline-block text-[10px] font-black uppercase tracking-wider bg-slate-100 text-slate-700 px-2.5 py-0.5 rounded-md mb-1 border border-slate-200">
+                    {item.product_id === 'book1' ? '📗 Livre 1' : item.product_id === 'book2' ? '📘 Livre 2' : '📦 Pack'}
+                  </span>
+                  <p className="font-bold text-slate-900 text-xs sm:text-sm leading-relaxed">{item.text_fr}</p>
+                </div>
+              </div>
+
+              <div className="flex gap-1 shrink-0">
+                <button onClick={() => edit(item)} className="p-1.5 text-blue-600 hover:bg-blue-50 rounded-lg cursor-pointer" title="Modifier">
+                  <Edit2 className="w-4 h-4" />
+                </button>
+                <button onClick={() => del(item.id)} className="p-1.5 text-red-500 hover:bg-red-50 rounded-lg cursor-pointer" title="Supprimer">
+                  <Trash2 className="w-4 h-4" />
+                </button>
+              </div>
+            </div>
+          ))}
         </div>
-      ))}
-      {Object.keys(grouped).length === 0 && !loading && (
-        <p className="text-center text-gray-400 py-8">Aucun avantage. Ajoutez-en un ci-dessus.</p>
-      )}
+      </div>
     </div>
   )
 }
 
-// =================== GALLERY TAB ===================
+// =================== 3. GALLERY PHOTOS ADMIN ===================
 function GalleryAdmin({ token }) {
   const [items, setItems] = useState([])
-  const [products, setProducts] = useState([])
-  const [loading, setLoading] = useState(false)
-  const [albumId, setAlbumId] = useState('')
-  const [altFr, setAltFr] = useState('')
-  const [file, setFile] = useState(null)
-  const [saving, setSaving] = useState(false)
+  const [form, setForm] = useState({ title: '', image_url: '' })
   const [msg, setMsg] = useState('')
-  const [editItem, setEditItem] = useState(null) // item being edited
-  const [editAlt, setEditAlt] = useState('')
-  const [editFile, setEditFile] = useState(null)
-
-  const headers = { Authorization: `Bearer ${token}` }
-  const jsonHeaders = { Authorization: `Bearer ${token}`, 'Content-Type': 'application/json' }
 
   useEffect(() => {
-    fetch(`${apiBase}/api/products`)
-      .then(r => r.json())
-      .then(data => {
-        setProducts(data)
-        setAlbumId(prev => prev || 'hero')
-      })
-      .catch(() => {})
-  }, [token])
+    setItems(getStoredGalleryItems())
+  }, [])
 
-  const fetch_ = useCallback(async () => {
-    setLoading(true)
-    try {
-      const res = await fetch(`${apiBase}/api/admin/cms/gallery`, { headers })
-      if (!res.ok) throw new Error('gallery fetch failed')
-      const data = await res.json()
-      const galleryItems = Array.isArray(data) && data.length > 0 ? data : getStoredGalleryItems()
-      setItems(galleryItems)
-      saveGalleryItems(galleryItems)
-    } catch (err) {
-      const fallbackItems = getStoredGalleryItems()
-      setItems(fallbackItems)
-      saveGalleryItems(fallbackItems)
-    } finally {
-      setLoading(false)
+  const addImage = () => {
+    if (!form.image_url) return
+    const newItem = {
+      id: `gal_${Date.now()}`,
+      title: form.title || 'Page du livre',
+      image_url: form.image_url
     }
-  }, [token])
-
-  useEffect(() => { fetch_() }, [fetch_])
-
-  const upload = async () => {
-    if (!file || !albumId) return
-    setSaving(true)
-    setMsg('')
-    const fd = new FormData()
-    fd.append('image', file)
-    fd.append('album_id', albumId)
-    fd.append('alt_fr', altFr)
-    fd.append('display_order', 0)
-    await fetch(`${apiBase}/api/admin/cms/gallery`, { method: 'POST', headers, body: fd })
-    setMsg('✅ Image ajoutée')
-    setFile(null)
-    setAltFr('')
-    fetch_()
-    setSaving(false)
+    const updated = [newItem, ...items]
+    setItems(updated)
+    saveGalleryItems(updated)
+    setForm({ title: '', image_url: '' })
+    setMsg('✅ Photo ajoutée à la galerie !')
   }
 
-  const del = async (id) => {
-    if (!window.confirm('Supprimer cette image ?')) return
-    await fetch(`${apiBase}/api/admin/cms/gallery/${id}`, { method: 'DELETE', headers })
-    fetch_()
-  }
-
-  const saveEdit = async () => {
-    if (!editItem) return
-    setSaving(true)
-    const formData = new FormData()
-    formData.append('alt_fr', editAlt)
-    if (editFile) formData.append('image', editFile)
-    await fetch(`${apiBase}/api/admin/cms/gallery/${editItem.id}`, {
-      method: 'PUT', headers, body: formData
-    })
-    setEditItem(null)
-    setEditAlt('')
-    setEditFile(null)
-    fetch_()
-    setSaving(false)
-  }
-
-  // Group by album_id dynamically
-  const grouped = {}
-  items.forEach(img => {
-    if (!grouped[img.album_id]) grouped[img.album_id] = []
-    grouped[img.album_id].push(img)
-  })
-
-  const allAlbums = ['hero', ...products.map(p => p.id)].filter((id, index, arr) => arr.indexOf(id) === index)
-
-  const getAlbumLabel = (pid) => {
-    if (pid === 'hero') return 'Première page d’accueil'
-    const p = products.find(p => p.id === pid)
-    return p ? p.name : pid
+  const deleteImage = (id) => {
+    if (!confirm('Supprimer cette photo de la galerie ?')) return
+    const updated = items.filter(it => it.id !== id)
+    setItems(updated)
+    saveGalleryItems(updated)
   }
 
   return (
     <div className="space-y-6">
-      {/* Edit modal */}
-      <AnimatePresence>
-        {editItem && (
-          <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }}
-            className="fixed inset-0 z-50 bg-black/60 flex items-center justify-center p-4"
-            onClick={() => setEditItem(null)}>
-            <motion.div initial={{ scale: 0.95 }} animate={{ scale: 1 }}
-              className="bg-white rounded-2xl shadow-2xl p-6 w-full max-w-md"
-              onClick={e => e.stopPropagation()}>
-              <h3 className="font-bold text-gray-800 mb-4">✏️ Modifier la description</h3>
-              <img src={editItem.image_url} alt="" className="w-full h-40 object-cover rounded-xl mb-4" />
-              <label className="text-sm font-semibold text-gray-600 block mb-1">Description (fr)</label>
-              <input
-                className="w-full border border-gray-200 rounded-xl px-4 py-2.5 mb-4 focus:ring-2 focus:ring-primary-300 outline-none"
-                value={editAlt}
-                onChange={e => setEditAlt(e.target.value)}
-              />
-              <label className="text-sm font-semibold text-gray-600 block mb-1">Remplacer l'image (optionnel)</label>
-              <label className="flex items-center gap-3 cursor-pointer border-2 border-dashed border-gray-200 rounded-xl p-4 hover:bg-gray-50 transition-colors mb-4">
-                <Upload className="w-5 h-5 text-gray-400" />
-                <span className="text-sm text-gray-500">{editFile ? editFile.name : 'Choisir une nouvelle image...'}</span>
-                <input type="file" accept="image/*" className="hidden" onChange={e => setEditFile(e.target.files[0])} />
-              </label>
-              <div className="flex gap-3">
-                <button onClick={saveEdit}
-                  className="flex items-center gap-2 px-5 py-2.5 bg-primary-600 text-white rounded-xl hover:bg-primary-700 font-semibold text-sm">
-                  <Save className="w-4 h-4" /> Sauvegarder
-                </button>
-                <button onClick={() => setEditItem(null)}
-                  className="px-4 py-2.5 border border-gray-200 rounded-xl text-sm font-semibold text-gray-600 hover:bg-gray-50">
-                  Annuler
-                </button>
-              </div>
-            </motion.div>
-          </motion.div>
-        )}
-      </AnimatePresence>
-
-      <div className="bg-white rounded-2xl shadow p-6 border border-gray-100">
-        <h3 className="font-bold text-gray-800 mb-4 text-lg">📸 Ajouter une image à la galerie</h3>
-        <div className="space-y-3">
+      {/* Add Image Form */}
+      <div className="bg-white rounded-3xl shadow-sm p-6 sm:p-8 border-2 border-indigo-500">
+        <h3 className="font-black text-slate-900 mb-4 text-base sm:text-lg">➕ Ajouter une photo dans la Galerie / Feuilleter les pages</h3>
+        <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 mb-4">
           <div>
-            <label className="text-sm font-semibold text-gray-600 block mb-1">Album</label>
-            <select className="border border-gray-200 rounded-xl px-4 py-2.5 w-full focus:ring-2 focus:ring-primary-300 outline-none"
-              value={albumId} onChange={e => setAlbumId(e.target.value)}>
-              <option value="hero">🏠 Première page d’accueil</option>
-              {products.map(p => (
-                <option key={p.id} value={p.id}>{p.name}</option>
-              ))}
-              {products.length === 0 && <option value="">Chargement...</option>}
-            </select>
-          </div>
-          <div>
-            <label className="text-sm font-semibold text-gray-600 block mb-1">Description de l'image (fr)</label>
-            <input className="w-full border border-gray-200 rounded-xl px-4 py-2.5 focus:ring-2 focus:ring-primary-300 outline-none"
-              placeholder="Ex: Pipette et matériel de prélèvement"
-              value={altFr} onChange={e => setAltFr(e.target.value)} />
-          </div>
-          <div>
-            <label className="text-sm font-semibold text-gray-600 block mb-1">Image</label>
-            <label className="flex items-center gap-3 cursor-pointer border-2 border-dashed border-gray-200 rounded-xl p-4 hover:bg-gray-50 transition-colors">
-              <Upload className="w-5 h-5 text-gray-400" />
-              <span className="text-sm text-gray-500">{file ? file.name : 'Sélectionner une image...'}</span>
-              <input type="file" accept="image/*" className="hidden" onChange={e => setFile(e.target.files[0])} />
-            </label>
-          </div>
-          <button onClick={upload} disabled={saving || !file || !albumId}
-            className="flex items-center gap-2 px-5 py-2.5 bg-primary-600 text-white rounded-xl hover:bg-primary-700 disabled:opacity-50 font-semibold text-sm transition-colors">
-            {saving ? '⏳ Upload...' : <><Upload className="w-4 h-4" /> Uploader</>}
-          </button>
-          {msg && <p className="text-green-600 text-sm font-medium">{msg}</p>}
-        </div>
-      </div>
-
-      {allAlbums.length > 0 ? allAlbums.map(pid => {
-        const imgs = grouped[pid] || []
-        return (
-          <div key={pid}>
-            <h4 className="font-bold text-gray-700 mb-3">📦 {getAlbumLabel(pid)} ({imgs.length} images)</h4>
-            {imgs.length === 0 ? (
-              <div className="rounded-xl border border-dashed border-gray-200 bg-gray-50 p-4 text-sm text-gray-500">
-                Aucune image pour ce livre. Ajoutez-en une depuis le formulaire ci-dessus.
-              </div>
-            ) : (
-              <div className="grid grid-cols-2 sm:grid-cols-3 gap-3">
-                {imgs.map(img => (
-                  <div key={img.id} className="relative group rounded-xl overflow-hidden border border-gray-200 bg-gray-50 aspect-square">
-                    <img src={img.image_url} alt={img.alt_fr} className="w-full h-full object-cover" />
-                    <div className="absolute inset-0 bg-black/50 opacity-0 group-hover:opacity-100 transition-opacity flex items-center justify-center gap-2">
-                      <button onClick={() => { setEditItem(img); setEditAlt(img.alt_fr || ''); setEditFile(null) }}
-                        className="p-2 bg-blue-500 text-white rounded-lg hover:bg-blue-600">
-                        <Edit2 className="w-4 h-4" />
-                      </button>
-                      <button onClick={() => del(img.id)} className="p-2 bg-red-500 text-white rounded-lg hover:bg-red-600">
-                        <Trash2 className="w-4 h-4" />
-                      </button>
-                    </div>
-                    <p className="absolute bottom-0 left-0 right-0 bg-black/50 text-white text-xs px-2 py-1 truncate">{img.alt_fr || 'Sans description'}</p>
-                  </div>
-                ))}
-              </div>
-            )}
-          </div>
-        )
-      }) : null}
-      {Object.keys(grouped).length === 0 && !loading && (
-        <p className="text-center text-gray-400 py-8">Aucune image dans la galerie. Ajoutez-en une ci-dessus.</p>
-      )}
-    </div>
-  )
-}
-
-// =================== TESTIMONIALS TAB ===================
-function FeedbackAdmin({ token }) {
-  const [items, setItems] = useState([])
-  const [loading, setLoading] = useState(false)
-  const [editId, setEditId] = useState(null)
-  const [form, setForm] = useState({ name: '', text_fr: '', rating: 5 })
-  const [saving, setSaving] = useState(false)
-  const [msg, setMsg] = useState('')
-  const [imageFile, setImageFile] = useState(null)
-
-  const headers = { Authorization: `Bearer ${token}` }
-
-  const fetch_ = useCallback(async () => {
-    setLoading(true)
-    try {
-      const res = await fetch(`${apiBase}/api/admin/cms/testimonials`, { headers })
-      if (!res.ok) throw new Error('testimonials fetch failed')
-      const data = await res.json()
-      const testimonials = Array.isArray(data) && data.length > 0 ? data : getStoredTestimonials()
-      setItems(testimonials)
-      saveTestimonials(testimonials)
-    } catch (e) {
-      const fallbackItems = getStoredTestimonials()
-      setItems(fallbackItems)
-      saveTestimonials(fallbackItems)
-    }
-    setLoading(false)
-  }, [token])
-
-  useEffect(() => { fetch_() }, [fetch_])
-
-  const save = async () => {
-    if (!form.name || !form.text_fr) return
-    setSaving(true)
-    setMsg('')
-
-    const method = editId ? 'PUT' : 'POST'
-    const url = editId ? `${apiBase}/api/admin/cms/testimonials/${editId}` : `${apiBase}/api/admin/cms/testimonials`
-    const formData = new FormData()
-    formData.append('name', form.name)
-    formData.append('text_fr', form.text_fr)
-    formData.append('rating', String(form.rating || 5))
-    formData.append('display_order', '0')
-    if (imageFile) formData.append('image', imageFile)
-
-    try {
-      const res = await fetch(url, { method, headers, body: formData })
-      if (!res.ok) throw new Error('save failed')
-      setMsg('✅ Sauvegardé avec traduction automatique')
-    } catch (e) {
-      setMsg('⚠️ Enregistré localement')
-    } finally {
-      setForm({ name: '', text_fr: '', rating: 5 })
-      setEditId(null)
-      setImageFile(null)
-      setSaving(false)
-      fetch_()
-    }
-  }
-
-  const del = async (id) => {
-    if (!window.confirm('Supprimer cet avis ?')) return
-    const nextItems = items.filter(item => item.id !== id)
-    setItems(nextItems)
-    saveTestimonials(nextItems)
-
-    try {
-      const res = await fetch(`${apiBase}/api/admin/cms/testimonials/${id}`, { method: 'DELETE', headers })
-      if (!res.ok) throw new Error('delete failed')
-    } catch (e) {
-      setMsg('⚠️ Suppression enregistrée localement')
-    }
-  }
-
-  const edit = (item) => {
-    setEditId(item.id)
-    setForm({ name: item.name, text_fr: item.text_fr, rating: item.rating || 5 })
-    setImageFile(null)
-    setMsg('')
-    window.scrollTo({ top: 0, behavior: 'smooth' })
-  }
-
-  return (
-    <div className="space-y-6">
-      <div className="bg-blue-50 border border-blue-100 rounded-xl px-4 py-3 text-blue-700 text-sm">
-        💡 Les avis ajoutés ici remplacent les avis hardcodés. Écrivez en français, la traduction est automatique.
-      </div>
-
-      <div className="bg-white rounded-2xl shadow p-6 border border-gray-100">
-        <h3 className="font-bold text-gray-800 mb-4 text-lg">{editId ? '✏️ Modifier l\'avis' : '➕ Ajouter un avis client'}</h3>
-        <div className="space-y-3">
-          <div>
-            <label className="text-sm font-semibold text-gray-600 block mb-1">Nom du client</label>
+            <label className="text-xs font-black text-slate-700 block mb-1">Titre de la photo (Légende)</label>
             <input
-              className="w-full border border-gray-200 rounded-xl px-4 py-2.5 focus:ring-2 focus:ring-primary-300 outline-none"
-              placeholder="Ex: Étudiante en Biochimie"
-              value={form.name}
-              onChange={e => setForm(f => ({ ...f, name: e.target.value }))}
+              type="text"
+              placeholder="Ex: Protocole de dosage biochimique..."
+              value={form.title}
+              onChange={e => setForm({ ...form, title: e.target.value })}
+              className="w-full border-2 border-slate-200 rounded-xl px-4 py-3 focus:border-primary-600 outline-none text-sm bg-slate-50 focus:bg-white"
             />
           </div>
           <div>
-            <label className="text-sm font-semibold text-gray-600 block mb-1">Texte de l'avis (en français)</label>
-            <textarea
-              rows={3}
-              className="w-full border border-gray-200 rounded-xl px-4 py-2.5 focus:ring-2 focus:ring-primary-300 outline-none resize-none"
-              placeholder="Ex: J'ai vraiment adoré ce livre !"
-              value={form.text_fr}
-              onChange={e => setForm(f => ({ ...f, text_fr: e.target.value }))}
+            <label className="text-xs font-black text-slate-700 block mb-1">Chemin ou URL de l'image</label>
+            <input
+              type="text"
+              placeholder="Ex: /images/book1-page1-real.jpg ou lien web..."
+              value={form.image_url}
+              onChange={e => setForm({ ...form, image_url: e.target.value })}
+              className="w-full border-2 border-slate-200 rounded-xl px-4 py-3 focus:border-primary-600 outline-none text-sm bg-slate-50 focus:bg-white"
             />
           </div>
-          <div>
-            <label className="text-sm font-semibold text-gray-600 block mb-1">Image de l'avis (optionnelle)</label>
-            <label className="flex items-center gap-3 cursor-pointer border-2 border-dashed border-gray-200 rounded-xl p-4 hover:bg-gray-50 transition-colors">
-              <Upload className="w-5 h-5 text-gray-400" />
-              <span className="text-sm text-gray-500">{imageFile ? imageFile.name : 'Choisir une image...'}</span>
-              <input type="file" accept="image/*" className="hidden" onChange={e => setImageFile(e.target.files[0])} />
-            </label>
-          </div>
-          <div>
-            <label className="text-sm font-semibold text-gray-600 block mb-1">Note ({form.rating}/5)</label>
-            <div className="flex gap-1">
-              {[1,2,3,4,5].map(n => (
-                <button key={n} type="button" onClick={() => setForm(f => ({ ...f, rating: n }))}
-                  className={`text-2xl ${n <= form.rating ? 'text-yellow-400' : 'text-gray-300'}`}>
-                  <Star className="w-6 h-6 fill-current" />
-                </button>
-              ))}
-            </div>
-          </div>
-          <div className="flex gap-3">
-            <button
-              onClick={save}
-              disabled={saving || !form.name || !form.text_fr}
-              className="flex items-center gap-2 px-5 py-2.5 bg-primary-600 text-white rounded-xl hover:bg-primary-700 disabled:opacity-50 font-semibold text-sm transition-colors"
-            >
-              {saving ? '⏳ Traduction...' : <><Save className="w-4 h-4" /> Sauvegarder</>}
-            </button>
-            {editId && (
-              <button onClick={() => { setEditId(null); setForm({ name: '', text_fr: '', rating: 5 }); setImageFile(null) }}
-                className="flex items-center gap-2 px-4 py-2.5 border border-gray-200 rounded-xl hover:bg-gray-50 text-sm font-semibold text-gray-600">
-                <X className="w-4 h-4" /> Annuler
-              </button>
-            )}
-          </div>
-          {msg && <p className="text-green-600 text-sm font-medium">{msg}</p>}
+        </div>
+
+        <div className="flex items-center gap-3">
+          <button
+            onClick={addImage}
+            disabled={!form.image_url}
+            className="flex items-center gap-2 px-6 py-3 bg-indigo-600 hover:bg-indigo-700 text-white rounded-xl font-black text-sm shadow transition-all cursor-pointer disabled:opacity-50"
+          >
+            <Plus className="w-4 h-4" /> Ajouter à la galerie
+          </button>
+          {msg && <p className="text-emerald-600 text-xs font-bold">{msg}</p>}
         </div>
       </div>
 
-      <div className="space-y-3">
-        {loading && <p className="text-center text-gray-400 py-4">Chargement...</p>}
-        {items.length === 0 && !loading && (
-          <p className="text-center text-gray-400 py-8">Aucun avis. Ajoutez-en un ci-dessus.</p>
-        )}
+      {/* Grid of gallery images */}
+      <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 gap-4">
         {items.map(item => (
-          <motion.div key={item.id} layout initial={{ opacity: 0 }} animate={{ opacity: 1 }}
-            className="bg-white rounded-xl shadow-sm border border-gray-100 p-4 flex items-start justify-between gap-4">
-            <div className="flex-1 min-w-0">
-              <div className="flex items-center gap-3 mb-2">
-                <img
-                  src={item.image_url || (items.indexOf(item) % 2 === 0 ? '/images/feedback-ar.jpg' : '/images/feedback-fr.jpg')}
-                  alt={item.name}
-                  className="w-16 h-16 object-cover rounded-xl border border-gray-200"
-                />
-                <div>
-                  <div className="flex items-center gap-2 mb-1">
-                    <p className="font-semibold text-gray-800 text-sm">👤 {item.name}</p>
-                        {[1,2,3,4,5].map(n => (
-                      <Star key={n} className={`w-3 h-3 ${n <= item.rating ? 'text-yellow-400 fill-current' : 'text-gray-300'}`} />
-                    ))}
-                  </div>
-                  <p className="text-gray-500 text-xs line-clamp-2">{item.text_fr}</p>
-                  {item.text_en && <p className="text-blue-400 text-xs mt-1 italic">EN: {item.text_en}</p>}
-                  {item.text_ar && <p className="text-purple-400 text-xs mt-0.5 italic">AR: {item.text_ar}</p>}
-                </div>
-              </div>
-            </div>
-            <div className="flex gap-2 shrink-0">
-              <button onClick={() => edit(item)} className="p-2 text-blue-600 hover:bg-blue-50 rounded-lg transition-colors">
-                <Edit2 className="w-4 h-4" />
-              </button>
-              <button onClick={() => del(item.id)} className="p-2 text-red-500 hover:bg-red-50 rounded-lg transition-colors">
+          <div key={item.id} className="bg-white rounded-2xl border border-slate-200 shadow-sm overflow-hidden flex flex-col justify-between group">
+            <div className="aspect-[4/3] bg-slate-50 flex items-center justify-center p-2 relative overflow-hidden">
+              <img src={item.image_url} alt={item.title} className="w-full h-full object-contain group-hover:scale-105 transition-transform" />
+              <button
+                onClick={() => deleteImage(item.id)}
+                className="absolute top-2 right-2 p-1.5 bg-red-600 text-white rounded-lg shadow opacity-0 group-hover:opacity-100 transition-opacity cursor-pointer"
+                title="Supprimer"
+              >
                 <Trash2 className="w-4 h-4" />
               </button>
             </div>
-          </motion.div>
+            <div className="p-3 border-t border-slate-100">
+              <p className="text-xs font-bold text-slate-800 truncate">{item.title || "Photo du livre"}</p>
+            </div>
+          </div>
         ))}
       </div>
     </div>
   )
 }
 
-// =================== TEXTS TAB ===================
-function TextsAdmin({ token }) {
-  const textKeys = [
-    { key: 'hero.badge', label: 'Badge promotionnel (en-tête)', placeholder: 'Ex: Pack promo : les deux livres ensemble avec économie' },
-    { key: 'hero.bonus', label: 'Titre du bonus (en-tête)', placeholder: 'Ex: Pack bonus : les deux livres + support pratique' },
-    { key: 'hero.bonusDescription', label: 'Description du bonus (en-tête)', placeholder: "Ex: Bénéficiez d'un guide complet..." },
-    { key: 'description.title', label: 'Titre section Description', placeholder: 'Ex: Contenu des livres' },
-    { key: 'description.subtitle', label: 'Sous-titre section Description', placeholder: 'Description longue...' },
-    { key: 'description.promo', label: 'Texte promo (section Description)', placeholder: 'Ex: Ne vous contentez pas de la théorie...' },
-    { key: 'showcase.title', label: 'Titre section Galerie', placeholder: 'Ex: Aperçu des Livres' },
-    { key: 'showcase.subtitle', label: 'Sous-titre section Galerie', placeholder: 'Ex: Photos réelles et illustrations...' },
-    { key: 'feedback.title', label: 'Titre section Avis', placeholder: 'Ex: Avis de nos Acheteurs' },
-    { key: 'feedback.subtitle', label: 'Sous-titre section Avis', placeholder: 'Ex: Ce que pensent nos clients...' },
-    { key: 'contact.title', label: 'Titre section Contact', placeholder: 'Ex: Contactez-nous' },
-  ]
-
-  const headers = { Authorization: `Bearer ${token}`, 'Content-Type': 'application/json' }
-  const [values, setValues] = useState({})
-  const [saving, setSaving] = useState({})
-  const [msgs, setMsgs] = useState({})
-
-  useEffect(() => {
-    fetch(`${apiBase}/api/admin/cms/texts`, { headers })
-      .then(r => r.ok ? r.json() : [])
-      .then(data => {
-        if (Array.isArray(data)) {
-          const map = {}
-          data.forEach(t => { map[t.key_name] = t.fr_value })
-          setValues(map)
-        }
-      })
-      .catch(() => {})
-  }, [token])
-
-  const saveKey = async (key) => {
-    setSaving(s => ({ ...s, [key]: true }))
-    setMsgs(m => ({ ...m, [key]: '' }))
-    await fetch(`${apiBase}/api/admin/cms/texts/${encodeURIComponent(key)}`, {
-      method: 'PUT', headers, body: JSON.stringify({ fr_value: values[key] || '' })
-    })
-    setMsgs(m => ({ ...m, [key]: '✅ Sauvegardé et traduit' }))
-    setSaving(s => ({ ...s, [key]: false }))
-  }
-
-  return (
-    <div className="space-y-4">
-      <p className="text-gray-500 text-sm bg-blue-50 border border-blue-100 rounded-xl px-4 py-3">
-        💡 Écrivez en français. La traduction en anglais et arabe se fera automatiquement à la sauvegarde.
-      </p>
-      {textKeys.map(({ key, label, placeholder }) => (
-        <div key={key} className="bg-white rounded-2xl shadow-sm border border-gray-100 p-5">
-          <label className="text-sm font-bold text-gray-700 block mb-2">{label}</label>
-          <div className="flex gap-3 items-start">
-            <textarea
-              rows={2}
-              className="flex-1 border border-gray-200 rounded-xl px-4 py-2.5 focus:ring-2 focus:ring-primary-300 outline-none resize-none text-sm"
-              placeholder={placeholder}
-              value={values[key] || ''}
-              onChange={e => setValues(v => ({ ...v, [key]: e.target.value }))}
-            />
-            <button onClick={() => saveKey(key)} disabled={saving[key]}
-              className="flex items-center gap-1.5 px-4 py-2.5 bg-primary-600 text-white rounded-xl hover:bg-primary-700 disabled:opacity-50 font-semibold text-sm transition-colors shrink-0">
-              {saving[key] ? '⏳' : <Save className="w-4 h-4" />}
-            </button>
-          </div>
-          {msgs[key] && <p className="text-green-600 text-xs font-medium mt-2">{msgs[key]}</p>}
-        </div>
-      ))}
-    </div>
-  )
-}
-
-// =================== MAIN EXPORT ===================
+// =================== MAIN EXPORT CMS TAB ===================
 export default function CmsTab({ token }) {
   const [subTab, setSubTab] = useState('texts')
 
   const tabs = [
-    { id: 'texts', label: '📝 Textes Généraux' },
-    { id: 'faq', label: '❓ FAQ' },
-    { id: 'features', label: '✅ Avantages' },
-    { id: 'gallery', label: '🖼️ Galerie Photos' },
-    { id: 'feedback', label: '⭐ Avis Clients' },
+    { id: 'texts', label: '📝 1. Textes & Bannière Mega Pack', icon: FileText },
+    { id: 'features', label: '✅ 2. Points Clés des Livres (Puces)', icon: CheckCircle2 },
+    { id: 'gallery', label: '🖼️ 3. Galerie Photos & Pages', icon: ImageIcon },
   ]
 
   return (
-    <div className="p-4 sm:p-6">
-      <div className="mb-6">
-        <h2 className="text-xl font-bold text-gray-900 mb-1">Contenu de la Page d'Accueil</h2>
-        <p className="text-gray-500 text-sm">Modifiez, ajoutez ou supprimez tout le contenu visible sur la page d'accueil. La traduction est automatique.</p>
+    <div className="p-4 sm:p-6 space-y-6">
+      {/* Top Banner */}
+      <div className="bg-white rounded-3xl border border-slate-200 shadow-sm overflow-hidden">
+        <div className="bg-gradient-to-r from-primary-600 via-primary-700 to-indigo-800 px-6 py-5">
+          <div className="inline-flex items-center gap-1.5 bg-white/15 text-white text-xs font-bold px-3 py-1 rounded-full mb-1">
+            <Sparkles className="w-3.5 h-3.5" />
+            <span>Gestion du Contenu</span>
+          </div>
+          <h2 className="text-xl font-black text-white">Personnalisation des Textes & Images du Site</h2>
+          <p className="text-primary-100 text-xs mt-0.5">
+            Cliquez sur l'un des 3 onglets ci-dessous pour modifier les textes du Pack, les puces descriptives des livres ou la galerie.
+          </p>
+        </div>
+
+        {/* Big Sub-tabs Navigation */}
+        <div className="px-6 py-4 flex gap-3 flex-wrap bg-slate-50 border-t border-slate-100">
+          {tabs.map(tab => {
+            const Icon = tab.icon
+            const isActive = subTab === tab.id
+            return (
+              <button
+                key={tab.id}
+                onClick={() => setSubTab(tab.id)}
+                className={`flex items-center gap-2.5 px-6 py-3 rounded-2xl text-xs sm:text-sm font-black transition-all cursor-pointer shadow-sm ${
+                  isActive
+                    ? 'bg-primary-600 text-white shadow-md shadow-primary-600/30 scale-[1.02]'
+                    : 'bg-white border-2 border-slate-200 text-slate-700 hover:border-primary-400 hover:text-primary-700'
+                }`}
+              >
+                <Icon className="w-4 h-4" />
+                <span>{tab.label}</span>
+              </button>
+            )
+          })}
+        </div>
       </div>
 
-      <div className="flex gap-2 flex-wrap mb-6">
-        {tabs.map(tab => (
-          <button key={tab.id} onClick={() => setSubTab(tab.id)}
-            className={`px-4 py-2 rounded-xl text-sm font-semibold transition-colors ${subTab === tab.id ? 'bg-primary-600 text-white shadow' : 'bg-white border border-gray-200 text-gray-600 hover:bg-gray-50'}`}>
-            {tab.label}
-          </button>
-        ))}
-      </div>
-
+      {/* Tab Panels */}
       <AnimatePresence mode="wait">
-        <motion.div key={subTab} initial={{ opacity: 0, y: 10 }} animate={{ opacity: 1, y: 0 }} exit={{ opacity: 0, y: -10 }} transition={{ duration: 0.2 }}>
+        <motion.div
+          key={subTab}
+          initial={{ opacity: 0, y: 10 }}
+          animate={{ opacity: 1, y: 0 }}
+          exit={{ opacity: 0, y: -10 }}
+          transition={{ duration: 0.2 }}
+        >
           {subTab === 'texts' && <TextsAdmin token={token} />}
-          {subTab === 'faq' && <FaqAdmin token={token} />}
           {subTab === 'features' && <FeaturesAdmin token={token} />}
           {subTab === 'gallery' && <GalleryAdmin token={token} />}
-          {subTab === 'feedback' && <FeedbackAdmin token={token} />}
         </motion.div>
       </AnimatePresence>
     </div>

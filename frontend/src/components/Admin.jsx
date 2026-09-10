@@ -64,7 +64,7 @@ export default function Admin() {
       const res = await fetch(`${apiBase}/api/admin/orders`, {
         headers: { Authorization: `Bearer ${token}` },
       })
-      if (res.status === 401 && token !== 'admin-bypass-token') {
+      if (res.status === 401) {
         localStorage.removeItem('admin_token')
         setToken('')
         return
@@ -109,43 +109,18 @@ export default function Admin() {
   const handleLogin = async (e) => {
     e.preventDefault()
     setLoginError('')
-    const cleanPwd = (password || '').trim()
     try {
       const res = await fetch(`${apiBase}/api/admin/login`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ password: cleanPwd }),
+        body: JSON.stringify({ password: (password || '').trim() }),
       })
-      if (res.status === 401) {
-        if (cleanPwd === 'admin123' || cleanPwd === 'admin') {
-          const fallbackToken = 'admin-bypass-token'
-          localStorage.setItem('admin_token', fallbackToken)
-          setToken(fallbackToken)
-          return
-        }
-        setLoginError('Mot de passe incorrect')
-        return
-      }
-      if (!res.ok) {
-        if (cleanPwd === 'admin123' || cleanPwd === 'admin') {
-          const fallbackToken = 'admin-bypass-token'
-          localStorage.setItem('admin_token', fallbackToken)
-          setToken(fallbackToken)
-          return
-        }
-        setLoginError(`Erreur serveur (${res.status}). Réessayez.`)
-        return
-      }
+      if (res.status === 401) { setLoginError('Mot de passe incorrect'); return }
+      if (!res.ok) { setLoginError(`Erreur serveur (${res.status}). Réessayez.`); return }
       const { token: newToken } = await res.json()
       localStorage.setItem('admin_token', newToken)
       setToken(newToken)
     } catch {
-      if (cleanPwd === 'admin123' || cleanPwd === 'admin') {
-        const fallbackToken = 'admin-bypass-token'
-        localStorage.setItem('admin_token', fallbackToken)
-        setToken(fallbackToken)
-        return
-      }
       setLoginError('Impossible de contacter le serveur.')
     }
   }
@@ -312,43 +287,35 @@ export default function Admin() {
             </div>
           </div>
 
-          {/* Big Prominent Tab Navigation */}
-          <div className="flex gap-2 pt-3 pb-3 border-t border-slate-100 overflow-x-auto">
-            <button
-              onClick={() => setActiveTab('orders')}
-              className={`flex items-center gap-2.5 px-5 py-3 rounded-2xl text-xs sm:text-sm font-black transition-all cursor-pointer shadow-sm ${
-                activeTab === 'orders'
-                  ? 'bg-primary-600 text-white shadow-md shadow-primary-600/30 scale-[1.02]'
-                  : 'bg-slate-100 text-slate-700 hover:bg-slate-200'
-              }`}
-            >
-              <ShoppingBag className="w-4 h-4" />
-              <span>📦 1. Commandes ({stats.total})</span>
-            </button>
-
-            <button
-              onClick={() => setActiveTab('products')}
-              className={`flex items-center gap-2.5 px-5 py-3 rounded-2xl text-xs sm:text-sm font-black transition-all cursor-pointer shadow-sm ${
-                activeTab === 'products'
-                  ? 'bg-primary-600 text-white shadow-md shadow-primary-600/30 scale-[1.02]'
-                  : 'bg-slate-100 text-slate-700 hover:bg-slate-200'
-              }`}
-            >
-              <Package className="w-4 h-4" />
-              <span>🏷️ 2. Produits (Prix & Livres)</span>
-            </button>
-
-            <button
-              onClick={() => setActiveTab('cms')}
-              className={`flex items-center gap-2.5 px-5 py-3 rounded-2xl text-xs sm:text-sm font-black transition-all cursor-pointer shadow-sm ${
-                activeTab === 'cms'
-                  ? 'bg-primary-600 text-white shadow-md shadow-primary-600/30 scale-[1.02]'
-                  : 'bg-slate-100 text-slate-700 hover:bg-slate-200'
-              }`}
-            >
-              <Globe className="w-4 h-4" />
-              <span>🌐 3. Contenu du Site (Textes & CMS)</span>
-            </button>
+          {/* Tab Navigation */}
+          <div className="flex gap-1 pt-1 overflow-x-auto">
+            {[
+              { id: 'orders',   label: 'Commandes',       icon: ShoppingBag, count: stats.total },
+              { id: 'products', label: 'Produits',         icon: Package },
+              { id: 'cms',      label: "Contenu du Site",  icon: Globe },
+            ].map(tab => {
+              const Icon = tab.icon
+              const isActive = activeTab === tab.id
+              return (
+                <button
+                  key={tab.id}
+                  onClick={() => setActiveTab(tab.id)}
+                  className={`flex items-center gap-2 px-4 py-2.5 text-xs font-bold whitespace-nowrap border-b-2 transition-all cursor-pointer ${
+                    isActive
+                      ? 'border-primary-600 text-primary-700 bg-primary-50/50'
+                      : 'border-transparent text-slate-500 hover:text-slate-800 hover:bg-slate-50'
+                  }`}
+                >
+                  <Icon className="w-4 h-4" />
+                  {tab.label}
+                  {tab.count !== undefined && (
+                    <span className={`px-1.5 py-0.5 rounded-full text-[10px] font-black ${isActive ? 'bg-primary-600 text-white' : 'bg-slate-200 text-slate-600'}`}>
+                      {tab.count}
+                    </span>
+                  )}
+                </button>
+              )
+            })}
           </div>
         </div>
       </header>
